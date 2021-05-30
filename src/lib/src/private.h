@@ -3,8 +3,11 @@
 
 #include "../include/ums.h"
 
+#include "ums_ioctl.h"
+
 #include <stddef.h>
 #include <errno.h>
+#include <sys/ioctl.h>
 
 
 

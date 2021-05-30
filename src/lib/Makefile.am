@@ -8,7 +8,7 @@ libums_la_SOURCES = \
     src/scheduler.c \
     src/worker.c
 
-libums_la_CPPFLAGS = -I$(srcdir)/include
+libums_la_CPPFLAGS = -I$(srcdir)/include -I$(srcdir)/../module/src/uapi
 
 libums_la_LDFLAGS = -version-info 0:0:0
 
