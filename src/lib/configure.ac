@@ -25,7 +25,6 @@ AC_LANG([C])
 # Checks for header files.
 AC_CHECK_HEADERS_ONCE([ features.h
                         pthread.h
-                        stdint.h
                         stddef.h
                         errno.h])
 

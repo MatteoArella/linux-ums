@@ -12,8 +12,8 @@ ums_completion_list_t comp_list;
 
 /* TODO: */
 static void sched_entry_proc(ums_reason_t reason,
-			    ums_activation_t activation,
-			    void *args)
+			     ums_activation_t *activation,
+			     void *args)
 {
 	switch (reason) {
 	case UMS_SCHEDULER_STARTUP:

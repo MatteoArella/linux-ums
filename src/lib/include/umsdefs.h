@@ -1,11 +1,10 @@
 #ifndef UMS_DEFS_H
 #define UMS_DEFS_H
 
-#include <stdint.h>
 #include <pthread.h>
 
-typedef uintptr_t ums_context_t;
-typedef uintptr_t ums_completion_list_t;
+typedef int ums_context_t;
+typedef int ums_completion_list_t;
 
 typedef union ums_activation_u {
 	ums_context_t contex;
@@ -25,7 +24,7 @@ typedef enum ums_reason_e {
 typedef struct ums_scheduler_startup_info_s {
 	ums_completion_list_t completion_list;
 	void (*ums_scheduler_entry_point)(ums_reason_t,
-					  ums_activation_t,
+					  ums_activation_t *,
 					  void *);
 	void *scheduler_param;
 } ums_scheduler_startup_info_t;

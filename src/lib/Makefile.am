@@ -5,6 +5,7 @@ lib_LTLIBRARIES = libums.la
 libums_la_SOURCES = \
 	src/complist.c \
 	src/context.c \
+    src/hooks.c \
     src/scheduler.c \
     src/worker.c
 
