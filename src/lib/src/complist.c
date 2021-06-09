@@ -2,8 +2,7 @@
 
 int create_ums_completion_list(ums_completion_list_t *completion_list)
 {
-	errno = ENOSYS;
-	return -1;
+	return 0;
 }
 
 int dequeue_ums_completion_list_items(ums_completion_list_t completion_list,

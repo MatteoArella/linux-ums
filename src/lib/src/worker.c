@@ -14,7 +14,7 @@ static void *worker_wrapper_routine(void *args)
 	struct enter_ums_mode_args ums_args = {
 		.flags = ENTER_UMS_WORK,
 		.ums_complist = worker_args->completion_list,
-		.ums_context = worker_args->context,
+		.ums_worker = worker_args->context,
 	};
 	int retval;
 
@@ -35,8 +35,21 @@ int ums_pthread_create(pthread_t *thread, ums_attr_t *ums_attr,
 		.func = func,
 		.args = args
 	};
+	pthread_attr_t pthread_attr;
 
-	return pthread_create(thread, ums_attr->pthread_attr, worker_wrapper_routine, &ums_args);
+	if (!ums_attr->pthread_attr) {
+		ums_attr->pthread_attr = &pthread_attr;
+		pthread_attr_init(ums_attr->pthread_attr);
+	}
+
+	// create detached
+	pthread_attr_setdetachstate(ums_attr->pthread_attr,
+				    PTHREAD_CREATE_DETACHED);
+
+	return pthread_create(thread,
+			      ums_attr->pthread_attr,
+			      worker_wrapper_routine,
+			      &ums_args);
 }
 
 int ums_thread_yield(void *scheduler_param)

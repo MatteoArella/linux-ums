@@ -4,16 +4,25 @@ EXTRA_PROGRAMS = automake_dummy
 
 automake_dummy_SOURCES = \
 	src/Makefile \
+	src/complist.h \
+	src/context.c \
+	src/context.h \
+	src/enter_ums.c \
+	src/ums.h \
 	src/ums_mod.c \
 	src/device.c \
 	src/device.h \
 	src/log.h \
-	src/uapi/ums_ioctl.h
+	src/scheduler.c \
+	src/scheduler.h \
+	src/uapi/ums_ioctl.h \
+	src/worker.c \
+	src/worker.h
 
 generated_sources =
 
 module_DATA = ums.o
-module_objs = ums_mod.o device.o
+module_objs = ums_mod.o context.o device.o enter_ums.o scheduler.o worker.o
 
 KERNEL_LOCATION=@kerneldir@
 

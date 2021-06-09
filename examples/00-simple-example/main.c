@@ -17,6 +17,7 @@ static void sched_entry_proc(ums_reason_t reason,
 {
 	switch (reason) {
 	case UMS_SCHEDULER_STARTUP:
+		printf("sched_entry_proc: UMS_SCHEDULER_STARTUP\n");
 		break;
 	case UMS_SCHEDULER_THREAD_BLOCKED:
 		break;
@@ -135,6 +136,11 @@ int main(int argc, char** argv)
 	}
 
 	/* TODO: create tasks and ums worker threads */
+	pthread_t worker;
+
+	if (create_ums_worker_thread(&worker, worker_pthread_proc, NULL) != 0) {
+		perror("create_ums_worker_thread");
+	}
 
 	if (release_ums_scheduling(sched_threads, nproc) != 0) {
 		perror("release_ums_scheduling");
