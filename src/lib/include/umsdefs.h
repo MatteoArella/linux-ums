@@ -31,7 +31,6 @@ typedef struct ums_scheduler_startup_info_s {
 
 typedef struct ums_attr_s {
 	ums_completion_list_t completion_list;
-	ums_context_t ums_context;
 	pthread_attr_t* pthread_attr;
 } ums_attr_t;
 

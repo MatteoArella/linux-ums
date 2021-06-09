@@ -6,9 +6,6 @@
 
 __BEGIN_DECLS
 
-extern int create_ums_thread_context(ums_context_t *ums_context)
-	__THROW __nonnull ((1));
-
 extern int create_ums_completion_list(ums_completion_list_t *completion_list)
 	__THROW __nonnull ((1));
 
@@ -31,9 +28,6 @@ extern int execute_ums_thread(ums_context_t ums_context) __THROW;
 extern int ums_thread_yield(void *scheduler_param) __THROW;
 
 extern int delete_ums_completion_list(ums_completion_list_t *completion_list)
-	__THROW __nonnull ((1));
-
-extern int delete_ums_thread_context(ums_context_t *ums_context)
 	__THROW __nonnull ((1));
 
 __END_DECLS

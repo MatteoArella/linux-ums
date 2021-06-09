@@ -1,6 +1,7 @@
 #include "ums.h"
 #include "device.h"
 #include "scheduler.h"
+#include "worker.h"
 
 #include <linux/init.h>
 #include <linux/fs.h>
@@ -45,6 +46,11 @@ static int scheduler_destroy(int id, void *sched, void *data)
 	return ums_scheduler_destroy(sched);
 }
 
+static int worker_destroy(int id, void *worker, void *data)
+{
+	return ums_worker_destroy(worker);
+}
+
 static int ums_dev_release(struct inode *inode, struct file *filp)
 {
 	struct ums_data *ums_data;
@@ -53,6 +59,7 @@ static int ums_dev_release(struct inode *inode, struct file *filp)
 
 	// destroy all
 	IDR_L_FOR_EACH(&ums_data->schedulers, scheduler_destroy, NULL);
+	IDR_L_FOR_EACH(&ums_data->workers, worker_destroy, NULL);
 
 	IDR_L_DESTROY(&ums_data->comp_lists);
 	IDR_L_DESTROY(&ums_data->schedulers);
@@ -81,14 +88,12 @@ static long ums_dev_ioctl(struct file *filp,
 				(struct ums_data *) filp->private_data,
 				(struct ums_sched_dqevent_args __user *) arg);
 		break;
-	case IOCTL_CREATE_UMS_CTX:
 	case IOCTL_CREATE_UMS_CLIST:
 	case IOCTL_DEQUEUE_UMS_CLIST:
 	case IOCTL_NEXT_UMS_CLIST:
 	case IOCTL_EXEC_UMS_CTX:
 	case IOCTL_UMS_YIELD:
 	case IOCTL_DELETE_UMS_CLIST:
-	case IOCTL_DELETE_UMS_CTX:
 		retval = -ENOSYS;
 		break;
 	default:
@@ -114,14 +119,12 @@ static int ums_dev_ioctl(struct inode *node,
 				(struct ums_data *) filp->private_data,
 				(struct ums_sched_dqevent_args __user *) arg);
 		break;
-	case IOCTL_CREATE_UMS_CTX:
 	case IOCTL_CREATE_UMS_CLIST:
 	case IOCTL_DEQUEUE_UMS_CLIST:
 	case IOCTL_NEXT_UMS_CLIST:
 	case IOCTL_EXEC_UMS_CTX:
 	case IOCTL_UMS_YIELD:
 	case IOCTL_DELETE_UMS_CLIST:
-	case IOCTL_DELETE_UMS_CTX:
 		retval = -ENOSYS;
 		break;
 	default:

@@ -100,23 +100,12 @@ int release_ums_scheduling(pthread_t *sched_threads,
 int create_ums_worker_thread(pthread_t *thread, void *(*func)(void *),
 			    void *arg)
 {
-	ums_context_t ctx;
 	ums_attr_t attr;
 
-	if (create_ums_thread_context(&ctx) != 0)
-		goto err;
-
 	attr.completion_list = comp_list;
-	attr.ums_context = ctx;
 	attr.pthread_attr = NULL;
 
-	if (ums_pthread_create(thread, &attr, func, arg))
-		goto create_ums_ctx;
-
-create_ums_ctx:
-	delete_ums_thread_context(&ctx);
-err:
-	return -1;
+	return ums_pthread_create(thread, &attr, func, arg);
 }
 
 /* TODO: */

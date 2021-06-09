@@ -2,7 +2,6 @@
 
 typedef struct worker_proc_args_s {
 	ums_completion_list_t completion_list;
-	ums_context_t context;
 	void *(*func)(void *);
 	void *args;
 } worker_proc_args_t;
@@ -13,8 +12,7 @@ static void *worker_wrapper_routine(void *args)
 
 	struct enter_ums_mode_args ums_args = {
 		.flags = ENTER_UMS_WORK,
-		.ums_complist = worker_args->completion_list,
-		.ums_worker = worker_args->context,
+		.ums_complist = worker_args->completion_list
 	};
 	int retval;
 
@@ -31,7 +29,6 @@ int ums_pthread_create(pthread_t *thread, ums_attr_t *ums_attr,
 {
 	worker_proc_args_t ums_args = {
 		.completion_list = ums_attr->completion_list,
-		.context = ums_attr->ums_context,
 		.func = func,
 		.args = args
 	};

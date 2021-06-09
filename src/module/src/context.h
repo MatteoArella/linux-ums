@@ -5,7 +5,6 @@
 #include <linux/sched.h>
 
 struct ums_context {
-	u32 id;
 	struct task_struct *task;
 	struct list_head list;
 };
