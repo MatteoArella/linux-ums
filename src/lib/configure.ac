@@ -31,7 +31,10 @@ AC_LANG([C])
 AC_CHECK_HEADERS_ONCE([ features.h
                         pthread.h
                         stddef.h
-                        errno.h])
+                        errno.h
+                        unistd.h
+                        fcntl.h
+                        sys/ioctl.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 

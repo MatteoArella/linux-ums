@@ -4,10 +4,11 @@
 #include <pthread.h>
 
 typedef int ums_context_t;
+
 typedef int ums_completion_list_t;
 
 typedef union ums_activation_u {
-	ums_context_t contex;
+	ums_context_t context;
 } ums_activation_t;
 
 typedef enum ums_reason_e {
@@ -31,7 +32,7 @@ typedef struct ums_scheduler_startup_info_s {
 
 typedef struct ums_attr_s {
 	ums_completion_list_t completion_list;
-	pthread_attr_t* pthread_attr;
+	pthread_attr_t *pthread_attr;
 } ums_attr_t;
 
 #endif /* UMS_DEFS_H */

@@ -4,6 +4,7 @@ EXTRA_PROGRAMS = lint_dummy automake_dummy
 
 lint_dummy_SOURCES = \
 	src/Makefile \
+	src/complist.c \
 	src/complist.h \
 	src/context.c \
 	src/context.h \
@@ -23,7 +24,7 @@ automake_dummy_SOURCES = \
 	src/uapi/ums_ioctl.h
 
 module_DATA = ums.o
-module_objs = ums_mod.o context.o device.o enter_ums.o scheduler.o worker.o
+module_objs = ums_mod.o complist.o context.o device.o enter_ums.o scheduler.o worker.o
 
 MODULE_EXTRA_CFLAGS = $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -Wall -Werror

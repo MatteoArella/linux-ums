@@ -12,7 +12,8 @@ static void *worker_wrapper_routine(void *args)
 
 	struct enter_ums_mode_args ums_args = {
 		.flags = ENTER_UMS_WORK,
-		.ums_complist = worker_args->completion_list
+		.ums_complist = worker_args->completion_list,
+		.ums_worker = 0
 	};
 	int retval;
 

@@ -18,6 +18,18 @@ LT_INIT
 # Use the C language and compiler for the following checks
 AC_LANG([C])
 
+# Checks for header files.
+AC_CHECK_HEADERS_ONCE([ stdio.h
+                        stdlib.h
+                        stddef.h
+                        errno.h
+                        unistd.h
+                        sched.h
+                        pthread.h])
+
+# Checks for library functions.
+AC_SEARCH_LIBS([pthread_create], [pthread])
+
 AC_CONFIG_FILES([Makefile
                 00-simple-example/Makefile])
 

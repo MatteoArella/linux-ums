@@ -17,11 +17,10 @@ extern int enter_ums_scheduling_mode(
 		__THROW __nonnull ((1));
 
 extern int dequeue_ums_completion_list_items(
-	ums_completion_list_t completion_list, ums_context_t ums_thread_list)
-		__THROW;
+	ums_completion_list_t completion_list, ums_context_t *ums_thread_list)
+		__THROW __nonnull ((2));
 
-extern int get_next_ums_list_item(ums_context_t prev, ums_context_t *next)
-	__THROW __nonnull ((2));
+extern ums_context_t get_next_ums_list_item(ums_context_t context) __THROW;
 
 extern int execute_ums_thread(ums_context_t ums_context) __THROW;
 

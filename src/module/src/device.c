@@ -2,6 +2,7 @@
 
 #include "ums.h"
 #include "device.h"
+#include "complist.h"
 #include "scheduler.h"
 #include "worker.h"
 
@@ -53,6 +54,11 @@ static int worker_destroy(int id, void *worker, void *data)
 	return ums_worker_destroy(worker);
 }
 
+static int complist_destroy(int id, void *complist, void *data)
+{
+	return ums_complist_destroy(complist);
+}
+
 static int ums_dev_release(struct inode *inode, struct file *filp)
 {
 	struct ums_data *ums_data;
@@ -62,6 +68,7 @@ static int ums_dev_release(struct inode *inode, struct file *filp)
 	// destroy all
 	IDR_L_FOR_EACH(&ums_data->schedulers, scheduler_destroy, NULL);
 	IDR_L_FOR_EACH(&ums_data->workers, worker_destroy, NULL);
+	IDR_L_FOR_EACH(&ums_data->comp_lists, complist_destroy, NULL);
 
 	IDR_L_DESTROY(&ums_data->comp_lists);
 	IDR_L_DESTROY(&ums_data->schedulers);
@@ -80,6 +87,11 @@ static long ums_dev_ioctl(struct file *filp,
 	long retval;
 
 	switch (cmd) {
+	case IOCTL_CREATE_UMS_CLIST:
+		retval = create_ums_completion_list(
+				(struct ums_data *) filp->private_data,
+				(ums_comp_list_id_t __user *) arg);
+		break;
 	case IOCTL_ENTER_UMS:
 		retval = enter_ums_mode((struct ums_data *) filp->private_data,
 				(struct enter_ums_mode_args __user *) arg);
@@ -89,12 +101,22 @@ static long ums_dev_ioctl(struct file *filp,
 				(struct ums_data *) filp->private_data,
 				(struct ums_sched_dqevent_args __user *) arg);
 		break;
-	case IOCTL_CREATE_UMS_CLIST:
 	case IOCTL_DEQUEUE_UMS_CLIST:
-	case IOCTL_NEXT_UMS_CLIST:
+		retval = ums_complist_dqcontext(
+			(struct ums_data *) filp->private_data,
+			(struct dequeue_ums_complist_args __user *) arg);
+		break;
+	case IOCTL_NEXT_UMS_CTX_LIST:
+		retval = ums_complist_next_context(
+			(struct ums_data *) filp->private_data,
+			(struct ums_next_context_list_args __user *) arg);
+		break;
+	case IOCTL_DELETE_UMS_CLIST:
+		retval = ums_complist_delete(
+			(struct ums_data *) filp->private_data, arg);
+		break;
 	case IOCTL_EXEC_UMS_CTX:
 	case IOCTL_UMS_YIELD:
-	case IOCTL_DELETE_UMS_CLIST:
 		retval = -ENOTSUPP;
 		break;
 	default:

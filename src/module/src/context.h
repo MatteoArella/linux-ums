@@ -3,6 +3,8 @@
 #ifndef CONTEXT_H
 #define CONTEXT_H
 
+#include "ums.h"
+
 #include <linux/list.h>
 #include <linux/sched.h>
 

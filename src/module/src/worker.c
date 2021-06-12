@@ -84,6 +84,7 @@ int enter_ums_worker_mode(struct ums_data *data,
 			  struct enter_ums_mode_args *args)
 {
 	struct ums_worker *worker;
+	struct ums_complist *complist;
 	int retval;
 
 	worker = ums_worker_create(data);
@@ -92,14 +93,23 @@ int enter_ums_worker_mode(struct ums_data *data,
 		goto worker_create;
 	}
 
-	// TODO: get completion list and add worker context to it
+	complist = IDR_L_FIND(&data->comp_lists, args->ums_complist);
+	if (unlikely(!complist)) {
+		retval = -EINVAL;
+		goto complist_find;
+	}
 
+	ums_completion_list_add(complist, &worker->context);
+	worker->complist = complist;
 	args->ums_worker = worker->id;
 
 	suspend_worker(worker);
 
 	return 0;
 
+complist_find:
+	ums_worker_destroy(worker);
+	worker = NULL;
 worker_create:
 	return retval;
 }

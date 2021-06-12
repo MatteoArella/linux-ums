@@ -119,6 +119,7 @@ int enter_ums_scheduler_mode(struct ums_data *data,
 			     struct enter_ums_mode_args *args)
 {
 	struct ums_scheduler *scheduler;
+	struct ums_complist *complist;
 	struct ums_event *startup_event;
 	int retval;
 
@@ -128,14 +129,19 @@ int enter_ums_scheduler_mode(struct ums_data *data,
 		goto sched_create;
 	}
 
-	// TODO: get completion list and assign it to scheduler
+	complist = IDR_L_FIND(&data->comp_lists, args->ums_complist);
+	if (unlikely(!complist)) {
+		retval = -EINVAL;
+		goto complist_find;
+	}
 
+	scheduler->complist = complist;
 	args->ums_scheduler = scheduler->id;
 
 	startup_event = alloc_ums_event();
 	if (unlikely(!startup_event)) {
 		retval = -ENOMEM;
-		goto startup_event_alloc;
+		goto complist_find;
 	}
 
 	startup_event->type = SCHEDULER_STARTUP;
@@ -148,7 +154,7 @@ int enter_ums_scheduler_mode(struct ums_data *data,
 
 enqueue_startup_sched_event:
 	free_ums_event(&startup_event);
-startup_event_alloc:
+complist_find:
 	ums_scheduler_destroy(scheduler);
 	scheduler = NULL;
 sched_create:

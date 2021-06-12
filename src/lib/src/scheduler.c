@@ -12,7 +12,7 @@ int enter_ums_scheduling_mode(
 		.flags = ENTER_UMS_SCHED,
 		.ums_complist = scheduler_startup_info->completion_list
 	};
-	struct ums_sched_dqevent_args dqevent_args;
+	struct ums_sched_dqevent_args dqevent_args = { 0, { 0 } };
 	ums_sched_id_t sched;
 	struct ums_sched_event *event;
 	int retval;
