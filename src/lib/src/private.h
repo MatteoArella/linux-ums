@@ -11,7 +11,7 @@
 
 extern int UMS_FILENO;
 
-inline int enter_ums_mode(struct enter_ums_mode_args *args)
+static __always_inline int enter_ums_mode(struct enter_ums_mode_args *args)
 {
 	return ioctl(UMS_FILENO, IOCTL_ENTER_UMS, args);
 }

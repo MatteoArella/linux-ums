@@ -73,7 +73,6 @@ static int ums_dev_release(struct inode *inode, struct file *filp)
 	return 0;
 }
 
-#ifdef HAVE_UNLOCKED_IOCTL
 static long ums_dev_ioctl(struct file *filp,
 			  unsigned int cmd,
 			  unsigned long arg)
@@ -103,54 +102,13 @@ static long ums_dev_ioctl(struct file *filp,
 	}
 	return retval;
 }
-#else
-static int ums_dev_ioctl(struct inode *node,
-			 struct file *filp,
-			 unsigned int cmd,
-			 unsigned long arg)
-{
-	int retval;
-
-	switch (cmd) {
-	case IOCTL_ENTER_UMS:
-		retval = enter_ums_mode((struct ums_data *) filp->private_data,
-				(struct enter_ums_mode_args __user *) arg);
-		break;
-	case IOCTL_UMS_SCHED_DQEVENT:
-		retval = ums_sched_dqevent(
-				(struct ums_data *) filp->private_data,
-				(struct ums_sched_dqevent_args __user *) arg);
-		break;
-	case IOCTL_CREATE_UMS_CLIST:
-	case IOCTL_DEQUEUE_UMS_CLIST:
-	case IOCTL_NEXT_UMS_CLIST:
-	case IOCTL_EXEC_UMS_CTX:
-	case IOCTL_UMS_YIELD:
-	case IOCTL_DELETE_UMS_CLIST:
-		retval = -ENOTSUPP;
-		break;
-	default:
-		retval = -ENOTTY;
-	}
-	return retval;
-}
-#endif
 
 static const struct file_operations ums_fops = {
 	.owner = THIS_MODULE,
 	.open = ums_dev_open,
 	.release = ums_dev_release,
-
-#ifdef HAVE_UNLOCKED_IOCTL
 	.unlocked_ioctl = ums_dev_ioctl,
-
-#ifdef HAVE_COMPAT_IOCTL
 	.compat_ioctl = ums_dev_ioctl
-#endif
-
-#else
-	.ioctl = ums_dev_ioctl,
-#endif
 };
 
 static struct miscdevice ums_dev = {

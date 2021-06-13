@@ -12,10 +12,28 @@ AM_INIT_AUTOMAKE([foreign 1.13 subdir-objects])
 AM_SILENT_RULES([yes])
 
 AC_SUBST([with_kernel], [`uname -r`])
-AC_SUBST([kerneldir], [/lib/modules/$with_kernel/build])
-AC_SUBST([moduledir], [/lib/modules/$with_kernel/extra])
 
-AC_PATH_PROG([CHECKPATCH], [checkpatch], [$kerneldir/scripts/checkpatch.pl])
+AC_ARG_VAR([KERNELDIR], ["linux kernel dir"])
+
+AS_IF([test "x$KERNELDIR" = x], [
+    [KERNELDIR=/lib/modules/$with_kernel/build]
+    [moduledir=/lib/modules/$with_kernel/extra]
+
+    # check linux headers
+    AC_CHECK_HEADERS([linux/ioctl.h], [], [
+        AC_MSG_ERROR([You must install 'linux-headers-$with_kernel'])
+    ])
+], [])
+AC_SUBST([KERNELDIR])
+AC_SUBST([moduledir])
+
+# check if 'checkpatch.pl' script exists in PATH or in KERNELDIR
+AC_PATH_PROG([CHECKPATCH], [checkpatch.pl], [true])
+AS_IF([test "x$CHECKPATCH" = xtrue], [
+    AS_IF([test -f $KERNELDIR/scripts/checkpatch.pl], [
+        AC_SUBST([CHECKPATCH], [$KERNELDIR/scripts/checkpatch.pl])
+    ], [])
+])
 
 # Checks for programs.
 AC_PROG_CC

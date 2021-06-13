@@ -97,6 +97,9 @@ src/**/.*
 
 *.pc
 build
+!scripts/build
+targets
+buildroot/.config-fragment
 
 # http://www.gnu.org/software/automake
 Makefile

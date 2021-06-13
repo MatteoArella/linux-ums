@@ -8,6 +8,8 @@ AC_CONFIG_AUX_DIR([build-aux])
 
 AM_INIT_AUTOMAKE([foreign 1.13])
 
+AM_SILENT_RULES([yes])
+
 # Checks for programs.
 AC_PROG_CC
 LT_PREREQ([2.4])

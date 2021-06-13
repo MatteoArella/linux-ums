@@ -2,6 +2,7 @@
 
 #include "worker.h"
 
+#include <linux/err.h>
 #include <linux/slab.h>
 #include <linux/sched.h>
 

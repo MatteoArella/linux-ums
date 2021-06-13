@@ -20,7 +20,7 @@ pkgconfig_DATA = libums.pc
 
 # add static C code analysis
 static-check:
-	@$(CPPCHECK) -I $(srcdir)/include -I $(srcdir)/../module/src/uapi $(srcdir)
+	-@$(CPPCHECK) -I $(srcdir)/include -I $(srcdir)/../module/src/uapi $(srcdir)
 
 check-local: static-check
 

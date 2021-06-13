@@ -22,17 +22,13 @@ automake_dummy_SOURCES = \
 	$(lint_dummy_SOURCES) \
 	src/uapi/ums_ioctl.h
 
-generated_sources =
-
 module_DATA = ums.o
 module_objs = ums_mod.o context.o device.o enter_ums.o scheduler.o worker.o
-
-KERNEL_LOCATION=@kerneldir@
 
 MODULE_EXTRA_CFLAGS = $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -Wall -Werror
 
-export MODULE_EXTRA_CFLAGS KERNEL_LOCATION module_DATA module_objs
+export MODULE_EXTRA_CFLAGS module_DATA module_objs
 
 .PHONY: FORCE lint
 
@@ -41,8 +37,8 @@ $(automake_dummy_SOURCES): FORCE
 		($(MKDIR_P) $(@D) && $(LN_S) $(abs_top_srcdir)/$@ $@)
 
 # Add FORCE in case the kernel has changed.
-$(module_DATA): $(generated_sources) $(automake_dummy_SOURCES) FORCE
-	$(MAKE) -C $(KERNEL_LOCATION) M=$(abs_builddir)/src modules
+$(module_DATA): $(automake_dummy_SOURCES) FORCE
+	$(MAKE) -C $(KERNELDIR) M=$(abs_builddir)/src modules
 
 install-moduleDATA: $(module_DATA)
 	@test -z "$(DESTDIR)$(moduledir)" ||\
@@ -56,10 +52,10 @@ uninstall-moduleDATA:
 	modprobe -r ums
 
 clean-local:
-	$(MAKE) -C $(KERNEL_LOCATION) M=$(abs_builddir)/src clean
+	$(MAKE) -C $(KERNELDIR) M=$(abs_builddir)/src clean
 
 lint: $(lint_dummy_SOURCES)
-	@$(CHECKPATCH) --no-tree --ignore LINUX_VERSION_CODE --file $^
+	-@$(CHECKPATCH) --no-tree --ignore LINUX_VERSION_CODE --file $^
 
 check-local: lint
 

@@ -2,6 +2,7 @@
 
 #include "scheduler.h"
 
+#include <linux/err.h>
 #include <linux/uaccess.h>
 #include <linux/slab.h>
 
