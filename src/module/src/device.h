@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: AGPL-3.0-only */
+
 #ifndef UMS_DEVICE_H
 #define UMS_DEVICE_H
 

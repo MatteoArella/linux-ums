@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: AGPL-3.0-only */
+
 #ifndef UMS_H
 #define UMS_H
 
@@ -26,7 +28,7 @@ do {							\
 	spin_lock_init(idr_l.lock);			\
 } while (0)
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0)
+#if KERNEL_VERSION(3, 9, 0) <= LINUX_VERSION_CODE
 #define IDR_L_ALLOC(idr_l, ptr, flags)				\
 ({								\
 	int retval;						\
@@ -68,21 +70,21 @@ do {							\
 	spin_lock(idr_l.lock);				\
 	idr_for_each(idr_l.idr, func, data);		\
 	spin_unlock(idr_l.lock);			\
-} while(0)
+} while (0)
 
 #define IDR_L_REMOVE(idr_l, id)				\
 do {							\
 	spin_lock(idr_l.lock);				\
 	idr_remove(idr_l.idr, id);			\
 	spin_unlock(idr_l.lock);			\
-} while(0)
+} while (0)
 
 #define IDR_L_DESTROY(idr_l)				\
 do {							\
 	spin_lock(idr_l.lock);				\
 	idr_destroy(idr_l.idr);				\
 	spin_unlock(idr_l.lock);			\
-} while(0)
+} while (0)
 
 int ums_caches_init(void);
 void ums_caches_destroy(void);

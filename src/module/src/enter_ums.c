@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 #include "ums.h"
 
 #include "scheduler.h"
@@ -19,7 +21,8 @@ inline int enter_ums_mode(struct ums_data *data,
 		retval = enter_ums_scheduler_mode(data, &kargs);
 	else if (kargs.flags & ENTER_UMS_WORK)
 		retval = enter_ums_worker_mode(data, &kargs);
-	else return -EINVAL;
+	else
+		return -EINVAL;
 
 	if (!retval) {
 		if (copy_to_user(args,

@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: AGPL-3.0-only */
+
 #ifndef WORKER_H
 #define WORKER_H
 

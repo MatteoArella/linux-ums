@@ -15,6 +15,8 @@ AC_SUBST([with_kernel], [`uname -r`])
 AC_SUBST([kerneldir], [/lib/modules/$with_kernel/build])
 AC_SUBST([moduledir], [/lib/modules/$with_kernel/extra])
 
+AC_PATH_PROG([CHECKPATCH], [checkpatch], [$kerneldir/scripts/checkpatch.pl])
+
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL

@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: AGPL-3.0-only */
+
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
@@ -31,7 +33,8 @@ int enter_ums_scheduler_mode(struct ums_data *data,
 
 struct ums_event *alloc_ums_event(void);
 
-int enqueue_ums_sched_event(struct ums_scheduler *, struct ums_event *);
+int enqueue_ums_sched_event(struct ums_scheduler *scheduler,
+			    struct ums_event *event);
 
 int ums_scheduler_destroy(struct ums_scheduler *sched);
 

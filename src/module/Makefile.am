@@ -1,8 +1,8 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-EXTRA_PROGRAMS = automake_dummy
+EXTRA_PROGRAMS = lint_dummy automake_dummy
 
-automake_dummy_SOURCES = \
+lint_dummy_SOURCES = \
 	src/Makefile \
 	src/complist.h \
 	src/context.c \
@@ -15,9 +15,12 @@ automake_dummy_SOURCES = \
 	src/log.h \
 	src/scheduler.c \
 	src/scheduler.h \
-	src/uapi/ums_ioctl.h \
 	src/worker.c \
 	src/worker.h
+
+automake_dummy_SOURCES = \
+	$(lint_dummy_SOURCES) \
+	src/uapi/ums_ioctl.h
 
 generated_sources =
 
@@ -31,10 +34,10 @@ MODULE_EXTRA_CFLAGS = $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 
 export MODULE_EXTRA_CFLAGS KERNEL_LOCATION module_DATA module_objs
 
-.PHONY: FORCE
+.PHONY: FORCE lint
 
 $(automake_dummy_SOURCES): FORCE
-	test -f $(builddir)/$@ || \
+	@test -f $(builddir)/$@ || \
 		($(MKDIR_P) $(@D) && $(LN_S) $(abs_top_srcdir)/$@ $@)
 
 # Add FORCE in case the kernel has changed.
@@ -42,7 +45,7 @@ $(module_DATA): $(generated_sources) $(automake_dummy_SOURCES) FORCE
 	$(MAKE) -C $(KERNEL_LOCATION) M=$(abs_builddir)/src modules
 
 install-moduleDATA: $(module_DATA)
-	test -z "$(DESTDIR)$(moduledir)" ||\
+	@test -z "$(DESTDIR)$(moduledir)" ||\
 	    $(MKDIR_P) "$(DESTDIR)$(moduledir)"
 	$(INSTALL_DATA) $(abs_builddir)/src/ums.ko $(DESTDIR)$(moduledir)/ums.ko
 	depmod -a
@@ -54,5 +57,10 @@ uninstall-moduleDATA:
 
 clean-local:
 	$(MAKE) -C $(KERNEL_LOCATION) M=$(abs_builddir)/src clean
+
+lint: $(lint_dummy_SOURCES)
+	@$(CHECKPATCH) --no-tree --ignore LINUX_VERSION_CODE --file $^
+
+check-local: lint
 
 FORCE:

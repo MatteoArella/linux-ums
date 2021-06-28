@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 #include "scheduler.h"
 
 #include <linux/uaccess.h>
@@ -48,7 +50,8 @@ static inline int ums_scheduler_init(struct ums_data *data,
 
 	sched->id = retval;
 
-	if ((retval = ums_context_init(&sched->context)))
+	retval = ums_context_init(&sched->context);
+	if (unlikely(retval))
 		goto context_init;
 
 	spin_lock_init(&sched->lock);
@@ -119,7 +122,7 @@ int enter_ums_scheduler_mode(struct ums_data *data,
 	int retval;
 
 	scheduler = ums_scheduler_create(data);
-	if (unlikely(IS_ERR(scheduler))) {
+	if (IS_ERR(scheduler)) {
 		retval = PTR_ERR(scheduler);
 		goto sched_create;
 	}
@@ -174,8 +177,8 @@ do_dequeue_ums_sched_event(struct ums_scheduler *scheduler)
 	while (list_empty(&scheduler->event_q)) {
 		spin_unlock(&scheduler->lock);
 
-		if(wait_event_interruptible(scheduler->sched_wait_q,
-					    !list_empty(&scheduler->event_q)))
+		if (wait_event_interruptible(scheduler->sched_wait_q,
+					     !list_empty(&scheduler->event_q)))
 			return ERR_PTR(-ERESTARTSYS);
 
 		spin_lock(&scheduler->lock);
@@ -199,9 +202,10 @@ int ums_sched_dqevent(struct ums_data *data,
 	struct ums_event *e;
 	struct ums_sched_event kevent;
 
-	if ((retval = copy_from_user(&sched_id,
+	retval = copy_from_user(&sched_id,
 				&args->ums_scheduler,
-				sizeof(ums_sched_id_t))))
+				sizeof(ums_sched_id_t));
+	if (unlikely(retval))
 		return -EACCES;
 
 	// find scheduler

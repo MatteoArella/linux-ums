@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 #include "ums.h"
 #include "device.h"
 #include "scheduler.h"
@@ -94,7 +96,7 @@ static long ums_dev_ioctl(struct file *filp,
 	case IOCTL_EXEC_UMS_CTX:
 	case IOCTL_UMS_YIELD:
 	case IOCTL_DELETE_UMS_CLIST:
-		retval = -ENOSYS;
+		retval = -ENOTSUPP;
 		break;
 	default:
 		retval = -ENOTTY;
@@ -125,7 +127,7 @@ static int ums_dev_ioctl(struct inode *node,
 	case IOCTL_EXEC_UMS_CTX:
 	case IOCTL_UMS_YIELD:
 	case IOCTL_DELETE_UMS_CLIST:
-		retval = -ENOSYS;
+		retval = -ENOTSUPP;
 		break;
 	default:
 		retval = -ENOTTY;
@@ -134,7 +136,7 @@ static int ums_dev_ioctl(struct inode *node,
 }
 #endif
 
-static struct file_operations ums_fops = {
+static const struct file_operations ums_fops = {
 	.owner = THIS_MODULE,
 	.open = ums_dev_open,
 	.release = ums_dev_release,

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 #include "worker.h"
 
 #include <linux/slab.h>
@@ -24,7 +26,8 @@ static inline int ums_worker_init(struct ums_data *data,
 
 	worker->id = retval;
 
-	if ((retval = ums_context_init(&worker->context)))
+	retval = ums_context_init(&worker->context);
+	if (unlikely(retval))
 		goto context_init;
 
 	return 0;
@@ -62,8 +65,10 @@ alloc_worker:
 int ums_worker_destroy(struct ums_worker *worker)
 {
 	int retval;
+
 	retval = ums_context_destroy(&worker->context);
 	free_ums_worker(worker);
+
 	return retval;
 }
 
@@ -81,7 +86,7 @@ int enter_ums_worker_mode(struct ums_data *data,
 	int retval;
 
 	worker = ums_worker_create(data);
-	if (unlikely(IS_ERR(worker))) {
+	if (IS_ERR(worker)) {
 		retval = PTR_ERR(worker);
 		goto worker_create;
 	}

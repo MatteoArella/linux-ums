@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 #include "log.h"
 #include "ums.h"
 #include "device.h"
@@ -11,10 +13,12 @@ static int __init ums_init(void)
 	int retval;
 
 	retval = ums_caches_init();
-	if (retval) goto cache_init;
+	if (retval)
+		goto cache_init;
 
 	retval = register_ums_device();
-	if (retval) goto register_dev;
+	if (retval)
+		goto register_dev;
 
 	return 0;
 
