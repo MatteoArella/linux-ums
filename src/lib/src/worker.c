@@ -32,19 +32,20 @@ int ums_pthread_create(pthread_t *thread, ums_attr_t *ums_attr,
 		.func = func,
 		.args = args
 	};
-	pthread_attr_t pthread_attr;
+	pthread_attr_t default_pthread_attr;
+	pthread_attr_t *pthread_attr = &default_pthread_attr;
 
-	if (!ums_attr->pthread_attr) {
-		ums_attr->pthread_attr = &pthread_attr;
-		pthread_attr_init(ums_attr->pthread_attr);
-	}
+	if (ums_attr->pthread_attr)
+		pthread_attr = ums_attr->pthread_attr;
+	else
+		pthread_attr_init(pthread_attr);
 
 	// create detached
-	pthread_attr_setdetachstate(ums_attr->pthread_attr,
+	pthread_attr_setdetachstate(pthread_attr,
 				    PTHREAD_CREATE_DETACHED);
 
 	return pthread_create(thread,
-			      ums_attr->pthread_attr,
+			      pthread_attr,
 			      worker_wrapper_routine,
 			      &ums_args);
 }
