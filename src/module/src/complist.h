@@ -7,6 +7,7 @@
 #include "context.h"
 
 #include <linux/list.h>
+#include <linux/kref.h>
 
 struct ums_complist {
 	ums_comp_list_id_t id;
@@ -14,6 +15,9 @@ struct ums_complist {
 	struct list_head head;
 	spinlock_t lock;
 	wait_queue_head_t wait_q;
+	struct kref refcount;
+	struct rcu_head rhead;
+	struct ums_data *data;
 };
 
 int create_ums_completion_list(struct ums_data *data,
@@ -28,8 +32,14 @@ int ums_complist_dqcontext(struct ums_data *data,
 int ums_complist_next_context(struct ums_data *data,
 			      struct ums_next_context_list_args __user *args);
 
-int ums_complist_delete(struct ums_data *data, ums_comp_list_id_t complist_id);
+static inline struct ums_complist *get_ums_complist(struct ums_complist *c)
+{
+	kref_get(&c->refcount);
+	return c;
+}
 
-int ums_complist_destroy(struct ums_complist *complist);
+int put_ums_complist(struct ums_complist *complist);
+
+int ums_complist_delete(struct ums_data *data, ums_comp_list_id_t complist_id);
 
 #endif /* UMS_COMPLIST_H */

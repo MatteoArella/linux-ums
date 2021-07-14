@@ -11,6 +11,7 @@
 #include <linux/miscdevice.h>
 #include <linux/slab.h>
 #include <linux/errno.h>
+#include <linux/rhashtable.h>
 
 inline int ums_caches_init(void)
 {
@@ -25,38 +26,43 @@ inline void ums_caches_destroy(void)
 static int ums_dev_open(struct inode *inode, struct file *filp)
 {
 	struct ums_data *ums_data;
+	int retval;
 
 	/* check that device is opened in read-only mode */
 	if ((filp->f_flags & O_ACCMODE) != O_RDONLY)
 		return -EACCES;
 
 	ums_data = kzalloc(sizeof(struct ums_data), GFP_KERNEL);
-
 	if (unlikely(!ums_data))
 		return -ENOMEM;
 
 	IDR_L_INIT(&ums_data->comp_lists);
-	IDR_L_INIT(&ums_data->schedulers);
-	IDR_L_INIT(&ums_data->workers);
+
+	retval = rhashtable_init(&ums_data->context_table,
+				 &ums_context_params);
+	if (unlikely(retval))
+		goto alloc_ums_data;
 
 	filp->private_data = ums_data;
 
 	return 0;
+
+alloc_ums_data:
+	kfree(ums_data);
+	return retval;
 }
 
-static int scheduler_destroy(int id, void *sched, void *data)
+static void release_context(void *ptr, void *arg)
 {
-	return ums_scheduler_destroy(sched);
+	struct ums_context *context = ptr;
+
+	context->release(context);
 }
 
-static int worker_destroy(int id, void *worker, void *data)
+static int release_complist(int id, void *complist, void *data)
 {
-	return ums_worker_destroy(worker);
-}
-
-static int complist_destroy(int id, void *complist, void *data)
-{
-	return ums_complist_destroy(complist);
+	put_ums_complist(complist);
+	return 0;
 }
 
 static int ums_dev_release(struct inode *inode, struct file *filp)
@@ -66,13 +72,12 @@ static int ums_dev_release(struct inode *inode, struct file *filp)
 	ums_data = filp->private_data;
 
 	// destroy all
-	IDR_L_FOR_EACH(&ums_data->schedulers, scheduler_destroy, NULL);
-	IDR_L_FOR_EACH(&ums_data->workers, worker_destroy, NULL);
-	IDR_L_FOR_EACH(&ums_data->comp_lists, complist_destroy, NULL);
+	rhashtable_free_and_destroy(&ums_data->context_table,
+				    release_context,
+				    NULL);
 
+	IDR_L_FOR_EACH(&ums_data->comp_lists, release_complist, NULL);
 	IDR_L_DESTROY(&ums_data->comp_lists);
-	IDR_L_DESTROY(&ums_data->schedulers);
-	IDR_L_DESTROY(&ums_data->workers);
 
 	kfree(filp->private_data);
 	filp->private_data = NULL;
@@ -99,7 +104,7 @@ static long ums_dev_ioctl(struct file *filp,
 	case IOCTL_UMS_SCHED_DQEVENT:
 		retval = ums_sched_dqevent(
 				(struct ums_data *) filp->private_data,
-				(struct ums_sched_dqevent_args __user *) arg);
+				(struct ums_sched_event __user *) arg);
 		break;
 	case IOCTL_DEQUEUE_UMS_CLIST:
 		retval = ums_complist_dqcontext(
@@ -116,11 +121,20 @@ static long ums_dev_ioctl(struct file *filp,
 			(struct ums_data *) filp->private_data, arg);
 		break;
 	case IOCTL_EXEC_UMS_CTX:
+		retval = exec_ums_context(
+			(struct ums_data *) filp->private_data, arg);
+		break;
 	case IOCTL_UMS_YIELD:
-		retval = -ENOTSUPP;
+		retval = ums_thread_yield(
+			(struct ums_data *) filp->private_data,
+			(void __user *) arg);
+		break;
+	case IOCTL_EXIT_UMS:
+		retval = ums_thread_end(
+			(struct ums_data *) filp->private_data);
 		break;
 	default:
-		retval = -ENOTTY;
+		retval = -ENOTSUPP;
 	}
 	return retval;
 }

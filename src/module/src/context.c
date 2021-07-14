@@ -2,18 +2,17 @@
 
 #include "context.h"
 
-int ums_context_create(struct ums_context *context)
-{
-	return 0;
-}
-
-int ums_context_init(struct ums_context *context)
+void ums_context_init(struct ums_context *context)
 {
 	context->task = current;
-	return 0;
+	context->pid = current_context_pid();
 }
 
-int ums_context_destroy(struct ums_context *context)
+void prepare_switch_context(struct ums_context *from, struct ums_context *to)
 {
-	return 0;
+	rcu_assign_pointer(to->parent, from);
+	pr_debug("switching from %d to %d\n", from->pid, to->pid);
+
+	prepare_suspend_context(from);
+	wake_up_context(to);
 }

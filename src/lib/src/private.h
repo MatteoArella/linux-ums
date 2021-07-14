@@ -6,6 +6,7 @@
 #include "ums_ioctl.h"
 
 #include <stddef.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <sys/ioctl.h>
 

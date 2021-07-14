@@ -27,9 +27,11 @@ static inline int ums_complist_init(struct ums_data *data,
 		return retval;
 
 	complist->id = retval;
+	complist->data = data;
 	spin_lock_init(&complist->lock);
 	INIT_LIST_HEAD(&complist->head);
 	init_waitqueue_head(&complist->wait_q);
+	kref_init(&complist->refcount);
 
 	return 0;
 }
@@ -60,24 +62,40 @@ int create_ums_completion_list(struct ums_data *data,
 		retval = -EACCES;
 		goto copy_user;
 	}
-
 	return 0;
 
 copy_user:
 	ums_complist_deinit(data, complist);
 complist_init:
 	free_ums_complist(complist);
-	complist = NULL;
 alloc_complist:
 	return retval;
 }
 
+static void ums_complist_call_rcu(struct rcu_head *rhead)
+{
+	free_ums_complist(container_of(rhead, struct ums_complist, rhead));
+}
 
-int ums_complist_destroy(struct ums_complist *complist)
+static int ums_complist_destroy(struct ums_complist *complist)
 {
 	wake_up_all(&complist->wait_q);
-	free_ums_complist(complist);
+	ums_complist_deinit(complist->data, complist);
+	call_rcu(&complist->rhead, ums_complist_call_rcu);
 	return 0;
+}
+
+static void ums_complist_release(struct kref *kref)
+{
+	struct ums_complist *complist;
+
+	complist = container_of(kref, struct ums_complist, refcount);
+	ums_complist_destroy(complist);
+}
+
+int put_ums_complist(struct ums_complist *complist)
+{
+	return kref_put(&complist->refcount, ums_complist_release);
 }
 
 void ums_completion_list_add(struct ums_complist *complist,
@@ -116,6 +134,8 @@ do_dequeue_ums_complist_context(struct ums_complist *complist)
 
 	spin_unlock(&complist->lock);
 
+	pr_debug("dequeued context %d\n", context->pid);
+
 	return context;
 }
 
@@ -123,10 +143,9 @@ int ums_complist_dqcontext(struct ums_data *data,
 			   struct dequeue_ums_complist_args __user *args)
 {
 	ums_comp_list_id_t complist_id;
-	int retval;
 	struct ums_complist *complist;
 	struct ums_context *context;
-	struct ums_worker *worker;
+	int retval;
 
 	retval = copy_from_user(&complist_id,
 				&args->ums_complist,
@@ -135,45 +154,52 @@ int ums_complist_dqcontext(struct ums_data *data,
 		return -EACCES;
 
 	// find complist
+	rcu_read_lock();
 	complist = IDR_L_FIND(&data->comp_lists, complist_id);
-	if (unlikely(!complist))
-		return -EINVAL;
+	if (unlikely(!complist)) {
+		retval = -EINVAL;
+		goto out;
+	}
 
 	context = do_dequeue_ums_complist_context(complist);
-	if (IS_ERR(context))
-		return PTR_ERR(context);
-
-	worker = container_of(context, struct ums_worker, context);
+	if (IS_ERR(context)) {
+		retval = PTR_ERR(context);
+		goto out;
+	}
 
 	if (copy_to_user(&args->ums_context,
-			 &worker->id,
-			 sizeof(ums_worker_id_t)))
+			 &context->pid,
+			 sizeof(pid_t)))
 		retval = -EACCES;
-
+out:
+	rcu_read_unlock();
 	return retval;
 }
 
 int ums_complist_next_context(struct ums_data *data,
 			      struct ums_next_context_list_args __user *args)
 {
-	ums_worker_id_t worker_id;
-	int retval;
+	pid_t worker_pid;
 	struct ums_context *context;
-	struct ums_worker *worker;
 	struct list_head *context_list;
+	int retval = 0;
 
-	retval = copy_from_user(&worker_id,
+	retval = copy_from_user(&worker_pid,
 				&args->ums_context,
-				sizeof(ums_worker_id_t));
+				sizeof(pid_t));
 	if (unlikely(retval))
 		return -EACCES;
 
 	// find worker
-	worker = IDR_L_FIND(&data->workers, worker_id);
-	if (unlikely(!worker))
-		return -EINVAL;
+	rcu_read_lock();
+	context = rhashtable_lookup_fast(&data->context_table,
+					 &worker_pid,
+					 ums_context_params);
+	if (unlikely(!context)) {
+		retval = -ESRCH;
+		goto out;
+	}
 
-	context = &worker->context;
 	context_list = &context->list;
 
 	/*
@@ -181,40 +207,48 @@ int ums_complist_next_context(struct ums_data *data,
 	 * it with no synchronization
 	 */
 	if (list_empty(context_list)) {
-		worker_id = -1;
+		worker_pid = -1;
 		retval = copy_to_user(&args->ums_next_context,
-				&worker_id,
-				sizeof(ums_worker_id_t));
+				&worker_pid,
+				sizeof(pid_t));
 		if (unlikely(retval))
-			return -EACCES;
-		return 0;
+			retval = -EACCES;
+		goto out;
 	}
 
 	context = list_first_entry(context_list, struct ums_context, list);
-	worker = container_of(context, struct ums_worker, context);
-
 	list_del(&context->list);
 
 	// replace new head
 	list_replace_init(context_list, &context->list);
 
-	retval = copy_to_user(&args->ums_next_context,
-				&worker->id,
-				sizeof(ums_worker_id_t));
-	if (unlikely(retval))
-		return -EACCES;
+	pr_debug("dequeued context %d\n", context->pid);
 
-	return 0;
+	retval = copy_to_user(&args->ums_next_context,
+			      &context->pid,
+			      sizeof(pid_t));
+	if (unlikely(retval))
+		retval = -EACCES;
+out:
+	rcu_read_unlock();
+	return retval;
 }
 
 int ums_complist_delete(struct ums_data *data, ums_comp_list_id_t complist_id)
 {
 	struct ums_complist *complist;
+	int retval = 0;
 
 	// find complist
+	rcu_read_lock();
 	complist = IDR_L_FIND(&data->comp_lists, complist_id);
-	if (unlikely(!complist))
-		return -EINVAL;
+	if (unlikely(!complist)) {
+		retval = -EINVAL;
+		goto out;
+	}
 
-	return ums_complist_destroy(complist);
+	put_ums_complist(complist);
+out:
+	rcu_read_unlock();
+	return retval;
 }

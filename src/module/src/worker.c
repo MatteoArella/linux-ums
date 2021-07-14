@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 #include "worker.h"
+#include "scheduler.h"
 
 #include <linux/err.h>
 #include <linux/slab.h>
@@ -16,27 +17,18 @@ static inline void free_ums_worker(struct ums_worker *worker)
 	kfree(worker);
 }
 
+void ums_worker_release(struct ums_context *context);
+
 static inline int ums_worker_init(struct ums_data *data,
 				  struct ums_worker *worker)
 {
-	int retval;
+	ums_context_init(&worker->context);
+	worker->context.data = data;
+	worker->context.release = ums_worker_release;
 
-	retval = IDR_L_ALLOC(&data->workers, worker, GFP_KERNEL);
-	if (!retval)
-		goto id_alloc;
-
-	worker->id = retval;
-
-	retval = ums_context_init(&worker->context);
-	if (unlikely(retval))
-		goto context_init;
-
-	return 0;
-
-context_init:
-	IDR_L_REMOVE(&data->workers, worker->id);
-id_alloc:
-	return retval;
+	return rhashtable_insert_fast(&data->context_table,
+				      &worker->context.node,
+				      ums_context_params);
 }
 
 static inline struct ums_worker *ums_worker_create(struct ums_data *data)
@@ -58,27 +50,37 @@ static inline struct ums_worker *ums_worker_create(struct ums_data *data)
 
 worker_init:
 	free_ums_worker(worker);
-	worker = NULL;
 alloc_worker:
 	return ERR_PTR(retval);
 }
 
-int ums_worker_destroy(struct ums_worker *worker)
+void ums_worker_call_rcu(struct rcu_head *head)
 {
-	int retval;
+	struct ums_context *context;
+	struct ums_worker *worker;
 
-	retval = ums_context_destroy(&worker->context);
+	context = container_of(head, struct ums_context, rcu_head);
+	worker = container_of(context, struct ums_worker, context);
+
 	free_ums_worker(worker);
-
-	return retval;
 }
 
-static inline void suspend_worker(struct ums_worker *worker)
+void ums_worker_destroy(struct ums_worker *worker)
 {
-	set_current_state(TASK_INTERRUPTIBLE);
-	schedule();
+	put_ums_complist(worker->complist);
+	rhashtable_remove_fast(&worker->context.data->context_table,
+			       &worker->context.node,
+			       ums_context_params);
+	call_rcu(&worker->context.rcu_head, ums_worker_call_rcu);
 }
 
+void ums_worker_release(struct ums_context *context)
+{
+	struct ums_worker *worker;
+
+	worker = container_of(context, struct ums_worker, context);
+	ums_worker_destroy(worker);
+}
 
 int enter_ums_worker_mode(struct ums_data *data,
 			  struct enter_ums_mode_args *args)
@@ -93,23 +95,128 @@ int enter_ums_worker_mode(struct ums_data *data,
 		goto worker_create;
 	}
 
+	rcu_read_lock();
 	complist = IDR_L_FIND(&data->comp_lists, args->ums_complist);
 	if (unlikely(!complist)) {
 		retval = -EINVAL;
 		goto complist_find;
 	}
 
-	ums_completion_list_add(complist, &worker->context);
-	worker->complist = complist;
-	args->ums_worker = worker->id;
+	get_ums_complist(complist);
+	rcu_read_unlock();
 
-	suspend_worker(worker);
+	worker->complist = complist;
+
+	prepare_suspend_context(&worker->context);
+	ums_completion_list_add(complist, &worker->context);
+	schedule();
 
 	return 0;
 
 complist_find:
+	rcu_read_unlock();
 	ums_worker_destroy(worker);
-	worker = NULL;
 worker_create:
+	return retval;
+}
+
+int ums_thread_yield(struct ums_data *data, void __user *args)
+{
+	pid_t context_pid;
+	struct ums_context *sched_context;
+	struct ums_context *worker_context;
+	struct ums_worker *worker;
+	struct ums_scheduler *scheduler;
+	struct ums_event_node *kevent;
+
+	// find worker
+	context_pid = current_context_pid();
+
+	rcu_read_lock();
+	worker_context = rhashtable_lookup_fast(&data->context_table,
+						&context_pid,
+						ums_context_params);
+	if (unlikely(!worker_context)) {
+		rcu_read_unlock();
+		return -ESRCH;
+	}
+
+	kevent = alloc_ums_event();
+	if (unlikely(!kevent)) {
+		rcu_read_unlock();
+		return -ENOMEM;
+	}
+
+	worker = container_of(worker_context, struct ums_worker, context);
+
+	kevent->event.type = THREAD_YIELD;
+	kevent->event.yield_params.context = context_pid;
+	kevent->event.yield_params.scheduler_params = args;
+
+	sched_context = rcu_dereference(worker_context->parent);
+
+	scheduler = container_of(sched_context, struct ums_scheduler, context);
+	enqueue_ums_sched_event(scheduler, kevent);
+
+	prepare_switch_context(worker_context, sched_context);
+
+	ums_completion_list_add(worker->complist, worker_context);
+
+	rcu_read_unlock();
+
+	schedule();
+	return 0;
+}
+
+int ums_thread_end(struct ums_data *data)
+{
+	pid_t context_pid;
+	struct ums_context *sched_context;
+	struct ums_context *worker_context;
+	struct ums_scheduler *scheduler;
+	struct ums_worker *worker;
+	struct ums_event_node *kevent;
+	int retval;
+
+	// find worker context
+	context_pid = current_context_pid();
+
+	rcu_read_lock();
+	worker_context = rhashtable_lookup_fast(&data->context_table,
+						&context_pid,
+						ums_context_params);
+	if (unlikely(!worker_context)) {
+		rcu_read_unlock();
+		return -ESRCH;
+	}
+
+	kevent = alloc_ums_event();
+	if (unlikely(!kevent)) {
+		rcu_read_unlock();
+		return -ENOMEM;
+	}
+
+	sched_context = rcu_dereference(worker_context->parent);
+	if (unlikely(!sched_context)) {
+		retval = -ESRCH;
+		goto out;
+	}
+
+	scheduler = container_of(sched_context, struct ums_scheduler, context);
+	worker = container_of(worker_context, struct ums_worker, context);
+
+	kevent->event.type = THREAD_TERMINATED;
+	kevent->event.end_params.context = context_pid;
+
+	enqueue_ums_sched_event(scheduler, kevent);
+	wake_up_context(sched_context);
+
+	ums_worker_destroy(worker);
+	rcu_read_unlock();
+
+	return 0;
+out:
+	rcu_read_unlock();
+	free_ums_event(kevent);
 	return retval;
 }

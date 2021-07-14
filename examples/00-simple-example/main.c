@@ -15,54 +15,82 @@ struct context_list_node {
 	struct list_head list;
 };
 
-struct ums_runqueue {
-	pthread_mutex_t lock;
+struct ums_sched_rq {
 	struct list_head head;
 };
 
 ums_completion_list_t comp_list;
-struct ums_runqueue rq;
+__thread struct ums_sched_rq rq;
 
-static int enqueue_available_contexts(void)
+static inline void cleanup_handler(void *arg)
+{
+	struct context_list_node *node, *tmp;
+
+	list_for_each_entry_safe(node, tmp, &rq.head, list) {
+		list_del(&node->list);
+		free(node);
+	}
+}
+
+static struct context_list_node *get_next_context(void)
 {
 	ums_context_t context;
 	struct context_list_node *node;
 
-	pthread_mutex_lock(&rq.lock);
 	if (!list_empty(&rq.head)) {
-		pthread_mutex_unlock(&rq.lock);
-		return 0;
+		node = list_first_entry(&rq.head,
+					struct context_list_node,
+					list);
+		list_del(&node->list);
+		return node;
 	}
-	pthread_mutex_unlock(&rq.lock);
 
 	while (dequeue_ums_completion_list_items(comp_list, &context)) {
 		if (errno == EINTR)
 			continue;
 		else
-			return -1;
+			return NULL;
 	}
 
-	node = calloc(1, sizeof(*node));
+	node = malloc(sizeof(*node));
 	if (!node)
-		return -1;
+		return NULL;
 	node->context = context;
 
-	pthread_mutex_lock(&rq.lock);
 	list_add_tail(&node->list, &rq.head);
-	pthread_mutex_unlock(&rq.lock);
 
 	while ((context = get_next_ums_list_item(context)) != -1) {
-		node = calloc(1, sizeof(*node));
+		node = malloc(sizeof(*node));
 		if (!node)
-			return -1;
+			return NULL;
 		node->context = context;
 
-		pthread_mutex_lock(&rq.lock);
 		list_add_tail(&node->list, &rq.head);
-		pthread_mutex_unlock(&rq.lock);
 	}
 
-	return 0;
+	node = list_first_entry(&rq.head,
+				struct context_list_node,
+				list);
+	list_del(&node->list);
+
+	return node;
+}
+
+static inline void execute_next_context(void)
+{
+	struct context_list_node *node;
+	ums_context_t context;
+
+	node = get_next_context();
+	if (!node) {
+		perror("get_next_context");
+		return;
+	}
+
+	if (execute_ums_thread(node->context))
+		perror("execute_ums_thread");
+
+	free(node);
 }
 
 /* TODO: */
@@ -71,33 +99,29 @@ static void sched_entry_proc(ums_reason_t reason,
 			     void *args)
 {
 	ums_context_t context;
-	struct context_list_node *node;
-	long sched_id = (long) (intptr_t) args;
+	long worker_result;
 
 	switch (reason) {
 	case UMS_SCHEDULER_STARTUP:
-		if (enqueue_available_contexts()) {
-			perror("enqueue_available_contexts");
-			return;
-		}
-
-		pthread_mutex_lock(&rq.lock);
-		node = list_first_entry(&rq.head,
-					struct context_list_node,
-					list);
-		list_del(&node->list);
-		pthread_mutex_unlock(&rq.lock);
-
-		printf("[sched-%ld] using context %d\n",
-			sched_id,
-			node->context);
-		fflush(stdout);
-		free(node);
-
+		execute_next_context();
 		break;
 	case UMS_SCHEDULER_THREAD_BLOCKED:
 		break;
 	case UMS_SCHEDULER_THREAD_YIELD:
+		context = activation->context;
+		worker_result = *((long *) args);
+
+		printf("worker %d yielded with value %ld\n",
+		       context,
+		       worker_result);
+		fflush(stdout);
+
+		free(args);
+
+		execute_next_context();
+		break;
+	case UMS_SCHEDULER_THREAD_END:
+		execute_next_context();
 		break;
 	default:
 		break;
@@ -112,7 +136,14 @@ static void *sched_pthread_proc(void *arg)
 	sched_info.scheduler_param = arg;
 	sched_info.ums_scheduler_entry_point = sched_entry_proc;
 
-	enter_ums_scheduling_mode(&sched_info);
+	INIT_LIST_HEAD(&rq.head);
+
+	pthread_cleanup_push(cleanup_handler, NULL);
+
+	if (enter_ums_scheduling_mode(&sched_info))
+		perror("enter_ums_scheduling_mode");
+
+	pthread_cleanup_pop(1);
 
 	return NULL;
 }
@@ -123,9 +154,6 @@ int initialize_ums_scheduling(pthread_t *sched_threads,
 	pthread_attr_t attr;
 	cpu_set_t cpus;
 	long i;
-
-	INIT_LIST_HEAD(&rq.head);
-	pthread_mutex_init(&rq.lock, NULL);
 
 	if (pthread_attr_init(&attr))
 		goto err;
@@ -144,14 +172,13 @@ int initialize_ums_scheduling(pthread_t *sched_threads,
 		if (pthread_create(sched_threads + i,
 				  &attr,
 				  sched_pthread_proc,
-				  (void *) i))
+				  NULL))
 			goto pthread_create;
 	}
 	return 0;
 
 pthread_create:
 	for (; i > 0; i--) {
-		/* TODO: check ums pthread scheduler cancellation points */
 		pthread_cancel(sched_threads[i - 1]);
 		pthread_join(sched_threads[i - 1], NULL);
 	}
@@ -162,16 +189,16 @@ err:
 }
 
 int release_ums_scheduling(pthread_t *sched_threads,
-			  long nthreads)
+			   long nthreads)
 {
 	long i;
 
-	for (i = 0L; i < nthreads; i++)
+	for (i = 0L; i < nthreads; i++) {
+		pthread_cancel(sched_threads[i]);
 		pthread_join(sched_threads[i], NULL);
+	}
 
 	delete_ums_completion_list(&comp_list);
-
-	pthread_mutex_destroy(&rq.lock);
 
 	return 0;
 }
@@ -187,29 +214,43 @@ int create_ums_worker_thread(pthread_t *thread, void *(*func)(void *),
 	return ums_pthread_create(thread, &attr, func, arg);
 }
 
-/* TODO: */
 static void *worker_pthread_proc(void *arg)
 {
+	long *result;
+
+	result = malloc(sizeof(*result));
+	if (!result)
+		return NULL;
+
+	*result = (long) (intptr_t) arg;
+
+	if (ums_thread_yield(result))
+		perror("ums_thread_yield");
+
 	return NULL;
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-	long 			nproc = sysconf(_SC_NPROCESSORS_ONLN);
-	pthread_t 		sched_threads[nproc];
+	long			nproc = sysconf(_SC_NPROCESSORS_ONLN);
+	pthread_t		sched_threads[nproc];
+	long			nworkers = 24L * nproc;
+	pthread_t		workers[nworkers];
+	long			i;
 
 	if (initialize_ums_scheduling(sched_threads, nproc)) {
 		perror("initialize_ums_scheduling");
 		return 1;
 	}
 
-	/* TODO: create tasks and ums worker threads */
-	int nworkers = 24 * nproc;
-	pthread_t workers[nworkers];
-	int i;
-	for (i = 0; i < nworkers; i++)
-	if (create_ums_worker_thread(workers + i, worker_pthread_proc, NULL))
-		perror("create_ums_worker_thread");
+	for (i = 0L; i < nworkers; i++)
+		if (create_ums_worker_thread(workers + i,
+					     worker_pthread_proc,
+					     (void *) i))
+			perror("create_ums_worker_thread");
+
+	for (i = 0L; i < nworkers; i++)
+		pthread_join(workers[i], NULL);
 
 	if (release_ums_scheduling(sched_threads, nproc)) {
 		perror("release_ums_scheduling");

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 #include "scheduler.h"
+#include "worker.h"
 
 #include <linux/err.h>
 #include <linux/uaccess.h>
@@ -10,7 +11,7 @@ struct kmem_cache *ums_event_cache;
 
 int ums_scheduling_cache_create(void)
 {
-	ums_event_cache = KMEM_CACHE(ums_event, SLAB_HWCACHE_ALIGN);
+	ums_event_cache = KMEM_CACHE(ums_event_node, SLAB_HWCACHE_ALIGN);
 	return ums_event_cache != NULL ? 0 : -ENOMEM;
 }
 
@@ -29,44 +30,32 @@ static inline void free_ums_scheduler(struct ums_scheduler *scheduler)
 	kfree(scheduler);
 }
 
-inline struct ums_event *alloc_ums_event(void)
+struct ums_event_node *alloc_ums_event(void)
 {
 	return kmem_cache_zalloc(ums_event_cache, GFP_KERNEL);
 }
 
-static inline void free_ums_event(struct ums_event **event)
+void free_ums_event(struct ums_event_node *event)
 {
-	kmem_cache_free(ums_event_cache, *event);
-	*event = NULL;
+	kmem_cache_free(ums_event_cache, event);
 }
+
+void ums_scheduler_release(struct ums_context *context);
 
 static inline int ums_scheduler_init(struct ums_data *data,
 				     struct ums_scheduler *sched)
 {
-	int retval;
-
-	retval = IDR_L_ALLOC(&data->schedulers, sched, GFP_KERNEL);
-	if (!retval)
-		goto id_alloc;
-
-	sched->id = retval;
-
-	retval = ums_context_init(&sched->context);
-	if (unlikely(retval))
-		goto context_init;
+	ums_context_init(&sched->context);
+	sched->context.data = data;
+	sched->context.release = ums_scheduler_release;
 
 	spin_lock_init(&sched->lock);
-
 	INIT_LIST_HEAD(&sched->event_q);
-
 	init_waitqueue_head(&sched->sched_wait_q);
 
-	return 0;
-
-context_init:
-	IDR_L_REMOVE(&data->schedulers, sched->id);
-id_alloc:
-	return retval;
+	return rhashtable_insert_fast(&data->context_table,
+				      &sched->context.node,
+				      ums_context_params);
 }
 
 static inline struct ums_scheduler *ums_scheduler_create(struct ums_data *data)
@@ -88,31 +77,48 @@ static inline struct ums_scheduler *ums_scheduler_create(struct ums_data *data)
 
 sched_init:
 	free_ums_scheduler(scheduler);
-	scheduler = NULL;
 alloc_scheduler:
 	return ERR_PTR(retval);
 }
 
-int ums_scheduler_destroy(struct ums_scheduler *sched)
+void ums_scheduler_call_rcu(struct rcu_head *head)
 {
-	struct list_head *curr;
-	struct ums_event *event;
-	int retval;
+	struct ums_context *context;
+	struct ums_scheduler *scheduler;
+
+	context = container_of(head, struct ums_context, rcu_head);
+	scheduler = container_of(context, struct ums_scheduler, context);
+
+	free_ums_scheduler(scheduler);
+}
+
+void ums_scheduler_destroy(struct ums_scheduler *sched)
+{
+	struct ums_event_node *event, *tmp;
 
 	spin_lock(&sched->lock);
 
-	list_for_each(curr, &sched->event_q) {
-		event = list_entry(curr, struct ums_event, list);
+	list_for_each_entry_safe(event, tmp, &sched->event_q, list) {
 		list_del(&event->list);
-		free_ums_event(&event);
+		free_ums_event(event);
 	}
-
-	retval = ums_context_destroy(&sched->context);
 
 	spin_unlock(&sched->lock);
 
-	free_ums_scheduler(sched);
-	return 0;
+	put_ums_complist(sched->complist);
+	rhashtable_remove_fast(&sched->context.data->context_table,
+			       &sched->context.node,
+			       ums_context_params);
+	call_rcu(&sched->context.rcu_head, ums_scheduler_call_rcu);
+}
+
+void ums_scheduler_release(struct ums_context *context)
+{
+	struct ums_scheduler *scheduler;
+
+	scheduler = container_of(context, struct ums_scheduler, context);
+
+	ums_scheduler_destroy(scheduler);
 }
 
 int enter_ums_scheduler_mode(struct ums_data *data,
@@ -120,7 +126,7 @@ int enter_ums_scheduler_mode(struct ums_data *data,
 {
 	struct ums_scheduler *scheduler;
 	struct ums_complist *complist;
-	struct ums_event *startup_event;
+	struct ums_event_node *startup_event;
 	int retval;
 
 	scheduler = ums_scheduler_create(data);
@@ -129,14 +135,17 @@ int enter_ums_scheduler_mode(struct ums_data *data,
 		goto sched_create;
 	}
 
+	rcu_read_lock();
 	complist = IDR_L_FIND(&data->comp_lists, args->ums_complist);
 	if (unlikely(!complist)) {
 		retval = -EINVAL;
 		goto complist_find;
 	}
 
+	get_ums_complist(complist);
+	rcu_read_unlock();
+
 	scheduler->complist = complist;
-	args->ums_scheduler = scheduler->id;
 
 	startup_event = alloc_ums_event();
 	if (unlikely(!startup_event)) {
@@ -144,25 +153,21 @@ int enter_ums_scheduler_mode(struct ums_data *data,
 		goto complist_find;
 	}
 
-	startup_event->type = SCHEDULER_STARTUP;
+	startup_event->event.type = SCHEDULER_STARTUP;
 
-	retval = enqueue_ums_sched_event(scheduler, startup_event);
-	if (retval)
-		goto enqueue_startup_sched_event;
+	enqueue_ums_sched_event(scheduler, startup_event);
 
 	return 0;
 
-enqueue_startup_sched_event:
-	free_ums_event(&startup_event);
 complist_find:
+	rcu_read_unlock();
 	ums_scheduler_destroy(scheduler);
-	scheduler = NULL;
 sched_create:
 	return retval;
 }
 
-int enqueue_ums_sched_event(struct ums_scheduler *scheduler,
-			    struct ums_event *event)
+void enqueue_ums_sched_event(struct ums_scheduler *scheduler,
+			    struct ums_event_node *event)
 {
 	spin_lock(&scheduler->lock);
 	list_add_tail(&event->list, &scheduler->event_q);
@@ -170,14 +175,12 @@ int enqueue_ums_sched_event(struct ums_scheduler *scheduler,
 
 	// notify new event
 	wake_up_all(&scheduler->sched_wait_q);
-
-	return 0;
 }
 
-static inline struct ums_event *
+static inline struct ums_event_node *
 do_dequeue_ums_sched_event(struct ums_scheduler *scheduler)
 {
-	struct ums_event *event;
+	struct ums_event_node *event;
 
 	spin_lock(&scheduler->lock);
 
@@ -192,8 +195,10 @@ do_dequeue_ums_sched_event(struct ums_scheduler *scheduler)
 	}
 
 	// consume the event
-	event = list_first_entry(&scheduler->event_q, struct ums_event, list);
-	list_del(scheduler->event_q.next);
+	event = list_first_entry(&scheduler->event_q,
+				 struct ums_event_node,
+				 list);
+	list_del(&event->list);
 
 	spin_unlock(&scheduler->lock);
 
@@ -201,35 +206,88 @@ do_dequeue_ums_sched_event(struct ums_scheduler *scheduler)
 }
 
 int ums_sched_dqevent(struct ums_data *data,
-		      struct ums_sched_dqevent_args __user *args)
+		      struct ums_sched_event __user *args)
 {
-	ums_sched_id_t sched_id;
 	int retval;
+	pid_t context_pid;
 	struct ums_scheduler *scheduler;
-	struct ums_event *e;
-	struct ums_sched_event kevent;
-
-	retval = copy_from_user(&sched_id,
-				&args->ums_scheduler,
-				sizeof(ums_sched_id_t));
-	if (unlikely(retval))
-		return -EACCES;
+	struct ums_context *sched_context;
+	struct ums_event_node *e;
 
 	// find scheduler
-	scheduler = IDR_L_FIND(&data->schedulers, sched_id);
+	context_pid = current_context_pid();
+
+	rcu_read_lock();
+	sched_context = rhashtable_lookup_fast(&data->context_table,
+					       &context_pid,
+					       ums_context_params);
+	if (unlikely(!sched_context)) {
+		retval = -ESRCH;
+		goto out;
+	}
+
+	scheduler = container_of(sched_context, struct ums_scheduler, context);
 
 	e = do_dequeue_ums_sched_event(scheduler);
-	if (IS_ERR(e))
-		return PTR_ERR(e);
+	if (IS_ERR(e)) {
+		retval = PTR_ERR(e);
+		goto out;
+	}
 
-	kevent.type = e->type;
+	retval = copy_to_user(args,
+			      &e->event,
+			      sizeof(struct ums_sched_event));
+	if (unlikely(retval)) {
+		retval = -EACCES;
+		goto copy_user;
+	}
 
-	if (copy_to_user(&args->event,
-			 &kevent,
-			 sizeof(struct ums_sched_event)))
-		retval = -EACCES; // TODO: fix event lost
+	rcu_read_unlock();
 
-	free_ums_event(&e);
+	free_ums_event(e);
 
+	return 0;
+copy_user:
+	enqueue_ums_sched_event(scheduler, e);
+out:
+	rcu_read_unlock();
+	return retval;
+}
+
+int exec_ums_context(struct ums_data *data, pid_t worker_pid)
+{
+	pid_t context_pid;
+	struct ums_context *sched_context;
+	struct ums_context *worker_context;
+	int retval;
+
+	// find worker
+	rcu_read_lock();
+	worker_context = rhashtable_lookup_fast(&data->context_table,
+						&worker_pid,
+						ums_context_params);
+	if (unlikely(!worker_context)) {
+		retval = -ESRCH;
+		goto out;
+	}
+
+	// find current scheduler
+	context_pid = current_context_pid();
+
+	sched_context = rhashtable_lookup_fast(&data->context_table,
+					       &context_pid,
+					       ums_context_params);
+	if (unlikely(!sched_context)) {
+		retval = -ESRCH;
+		goto out;
+	}
+
+	prepare_switch_context(sched_context, worker_context);
+	rcu_read_unlock();
+
+	schedule();
+	return 0;
+out:
+	rcu_read_unlock();
 	return retval;
 }

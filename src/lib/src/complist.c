@@ -2,7 +2,7 @@
 
 int create_ums_completion_list(ums_completion_list_t *completion_list)
 {
-	ums_completion_list_t complist;
+	ums_comp_list_id_t complist;
 	int retval;
 
 	retval = ioctl(UMS_FILENO, IOCTL_CREATE_UMS_CLIST, &complist);

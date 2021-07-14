@@ -96,13 +96,13 @@ for t in "${tests[@]}"; do
   EXIT_STATUS=$?
   set -e; set +x
 
+  printf "\033[1;32mGDB:\033[0m\n"
+  cat $GDB_LOGFILE
+
+  printf "\n\033[1;32mDMESG:\033[0m\n"
+  qemu-bridge.sh shell "dmesg | grep ums"
+
   if [ $EXIT_STATUS != 0 ]; then
-    printf "\033[1;32mGDB:\033[0m\n"
-    cat $GDB_LOGFILE
-
-    printf "\n\033[1;32mDMESG:\033[0m\n"
-    qemu-bridge.sh shell "dmesg | grep ums"
-
     exit $EXIT_STATUS
   fi
 

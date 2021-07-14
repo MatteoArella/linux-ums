@@ -31,6 +31,7 @@ AC_LANG([C])
 AC_CHECK_HEADERS_ONCE([ features.h
                         pthread.h
                         stddef.h
+                        stdlib.h
                         errno.h
                         unistd.h
                         fcntl.h

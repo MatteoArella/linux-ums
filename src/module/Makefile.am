@@ -17,7 +17,8 @@ lint_dummy_SOURCES = \
 	src/scheduler.c \
 	src/scheduler.h \
 	src/worker.c \
-	src/worker.h
+	src/worker.h \
+	src/idr_l.h
 
 automake_dummy_SOURCES = \
 	$(lint_dummy_SOURCES) \
