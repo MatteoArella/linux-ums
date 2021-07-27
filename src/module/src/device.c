@@ -5,6 +5,7 @@
 #include "complist.h"
 #include "scheduler.h"
 #include "worker.h"
+#include "proc/base.h"
 
 #include <linux/init.h>
 #include <linux/fs.h>
@@ -36,18 +37,25 @@ static int ums_dev_open(struct inode *inode, struct file *filp)
 	if (unlikely(!ums_data))
 		return -ENOMEM;
 
+	/* initialize proc dirs */
+	retval = ums_proc_dirs_init(&ums_data->dirs);
+	if (unlikely(retval))
+		goto proc_dirs_init;
+
 	IDR_L_INIT(&ums_data->comp_lists);
 
 	retval = rhashtable_init(&ums_data->context_table,
 				 &ums_context_params);
 	if (unlikely(retval))
-		goto alloc_ums_data;
+		goto rhashtable_init;
 
 	filp->private_data = ums_data;
 
 	return 0;
 
-alloc_ums_data:
+rhashtable_init:
+	ums_proc_dirs_destroy(&ums_data->dirs);
+proc_dirs_init:
 	kfree(ums_data);
 	return retval;
 }
@@ -78,6 +86,8 @@ static int ums_dev_release(struct inode *inode, struct file *filp)
 
 	IDR_L_FOR_EACH(&ums_data->comp_lists, release_complist, NULL);
 	IDR_L_DESTROY(&ums_data->comp_lists);
+
+	ums_proc_dirs_destroy(&ums_data->dirs);
 
 	kfree(filp->private_data);
 	filp->private_data = NULL;

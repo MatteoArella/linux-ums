@@ -2,6 +2,8 @@
 
 #include "complist.h"
 #include "worker.h"
+#include "scheduler.h"
+#include "proc/scheduler.h"
 
 #include <linux/err.h>
 #include <linux/slab.h>
@@ -99,10 +101,13 @@ int put_ums_complist(struct ums_complist *complist)
 }
 
 void ums_completion_list_add(struct ums_complist *complist,
-			     struct ums_context *context)
+			     struct ums_context *context, unsigned int flags)
 {
 	spin_lock(&complist->lock);
-	list_add_tail(&context->list, &complist->head);
+	if (flags & COMPLIST_ADD_HEAD)
+		list_add(&context->list, &complist->head);
+	else if (flags & COMPLIST_ADD_TAIL)
+		list_add_tail(&context->list, &complist->head);
 	spin_unlock(&complist->lock);
 
 	// notify new context
@@ -144,7 +149,11 @@ int ums_complist_dqcontext(struct ums_data *data,
 {
 	ums_comp_list_id_t complist_id;
 	struct ums_complist *complist;
-	struct ums_context *context;
+	struct ums_context *context, *curr;
+	struct ums_context *sched_context;
+	struct ums_scheduler *scheduler;
+	struct ums_worker *worker;
+	pid_t scheduler_pid;
 	int retval;
 
 	retval = copy_from_user(&complist_id,
@@ -161,16 +170,50 @@ int ums_complist_dqcontext(struct ums_data *data,
 		goto out;
 	}
 
+	scheduler_pid = current_context_pid();
+
+	sched_context = rhashtable_lookup_fast(&data->context_table,
+					       &scheduler_pid,
+					       ums_context_params);
+	if (unlikely(!sched_context)) {
+		retval = -ESRCH;
+		goto out;
+	}
+
+	scheduler = container_of(sched_context, struct ums_scheduler, context);
+
 	context = do_dequeue_ums_complist_context(complist);
 	if (IS_ERR(context)) {
 		retval = PTR_ERR(context);
 		goto out;
 	}
 
+	// create one worker proc symlink for each context list entry
+	worker = container_of(context, struct ums_worker, context);
+
+	retval = ums_scheduler_proc_register_worker(&scheduler->dirs,
+						    &worker->dirs);
+	if (unlikely(retval))
+		goto register_worker;
+
+	list_for_each_entry(curr, &context->list, list) {
+		worker = container_of(curr, struct ums_worker, context);
+		ums_scheduler_proc_register_worker(&scheduler->dirs,
+						   &worker->dirs);
+	}
+
 	if (copy_to_user(&args->ums_context,
 			 &context->pid,
-			 sizeof(pid_t)))
+			 sizeof(pid_t))) {
 		retval = -EACCES;
+		goto register_worker;
+	}
+
+	rcu_read_unlock();
+	return 0;
+
+register_worker:
+	ums_completion_list_add(complist, context, COMPLIST_ADD_HEAD);
 out:
 	rcu_read_unlock();
 	return retval;

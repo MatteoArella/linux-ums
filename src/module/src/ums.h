@@ -6,6 +6,7 @@
 #include "uapi/ums_ioctl.h"
 #include "log.h"
 #include "idr_l.h"
+#include "proc/base.h"
 
 #include <linux/init.h>
 #include <linux/errno.h>
@@ -15,6 +16,7 @@
 struct ums_data {
 	struct idr_l comp_lists;
 	struct rhashtable context_table;
+	struct ums_proc_dirs dirs;
 };
 
 int ums_caches_init(void);

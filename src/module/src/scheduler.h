@@ -8,8 +8,12 @@
 #include "ums.h"
 #include "context.h"
 #include "complist.h"
+#include "proc/scheduler.h"
 
 #include <linux/list.h>
+
+#define EVENT_ADD_HEAD		1U
+#define EVENT_ADD_TAIL		2U
 
 struct ums_event_node {
 	struct ums_sched_event event;
@@ -22,6 +26,8 @@ struct ums_scheduler {
 	struct list_head event_q;
 	spinlock_t lock;
 	wait_queue_head_t sched_wait_q;
+
+	struct ums_scheduler_proc_dirs dirs;
 };
 
 int ums_scheduling_cache_create(void);
@@ -34,7 +40,8 @@ struct ums_event_node *alloc_ums_event(void);
 void free_ums_event(struct ums_event_node *event);
 
 void enqueue_ums_sched_event(struct ums_scheduler *scheduler,
-			    struct ums_event_node *event);
+			    struct ums_event_node *event,
+			    unsigned int flags);
 
 void ums_scheduler_destroy(struct ums_scheduler *sched);
 

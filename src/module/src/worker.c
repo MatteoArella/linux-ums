@@ -22,9 +22,15 @@ void ums_worker_release(struct ums_context *context);
 static inline int ums_worker_init(struct ums_data *data,
 				  struct ums_worker *worker)
 {
+	int retval;
+
 	ums_context_init(&worker->context);
 	worker->context.data = data;
 	worker->context.release = ums_worker_release;
+
+	retval = ums_worker_proc_register(&data->dirs, worker);
+	if (unlikely(retval))
+		return retval;
 
 	return rhashtable_insert_fast(&data->context_table,
 				      &worker->context.node,
@@ -62,12 +68,17 @@ void ums_worker_call_rcu(struct rcu_head *head)
 	context = container_of(head, struct ums_context, rcu_head);
 	worker = container_of(context, struct ums_worker, context);
 
+	ums_context_deinit(context);
+
 	free_ums_worker(worker);
 }
 
 void ums_worker_destroy(struct ums_worker *worker)
 {
 	put_ums_complist(worker->complist);
+
+	ums_worker_proc_unregister(worker);
+
 	rhashtable_remove_fast(&worker->context.data->context_table,
 			       &worker->context.node,
 			       ums_context_params);
@@ -108,7 +119,7 @@ int enter_ums_worker_mode(struct ums_data *data,
 	worker->complist = complist;
 
 	prepare_suspend_context(&worker->context);
-	ums_completion_list_add(complist, &worker->context);
+	ums_completion_list_add(complist, &worker->context, COMPLIST_ADD_TAIL);
 	schedule();
 
 	return 0;
@@ -156,11 +167,13 @@ int ums_thread_yield(struct ums_data *data, void __user *args)
 	sched_context = rcu_dereference(worker_context->parent);
 
 	scheduler = container_of(sched_context, struct ums_scheduler, context);
-	enqueue_ums_sched_event(scheduler, kevent);
+	enqueue_ums_sched_event(scheduler, kevent, EVENT_ADD_TAIL);
 
 	prepare_switch_context(worker_context, sched_context);
 
-	ums_completion_list_add(worker->complist, worker_context);
+	ums_completion_list_add(worker->complist,
+				worker_context,
+				COMPLIST_ADD_TAIL);
 
 	rcu_read_unlock();
 
@@ -208,7 +221,7 @@ int ums_thread_end(struct ums_data *data)
 	kevent->event.type = THREAD_TERMINATED;
 	kevent->event.end_params.context = context_pid;
 
-	enqueue_ums_sched_event(scheduler, kevent);
+	enqueue_ums_sched_event(scheduler, kevent, EVENT_ADD_TAIL);
 	wake_up_context(sched_context);
 
 	ums_worker_destroy(worker);

@@ -8,10 +8,13 @@
 #include "ums.h"
 #include "context.h"
 #include "complist.h"
+#include "proc/worker.h"
 
 struct ums_worker {
 	struct ums_context context;
 	struct ums_complist *complist;
+
+	struct ums_worker_proc_dirs dirs;
 };
 
 int enter_ums_worker_mode(struct ums_data *data,

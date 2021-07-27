@@ -2,6 +2,7 @@
 
 #include "scheduler.h"
 #include "worker.h"
+#include "proc/scheduler.h"
 
 #include <linux/err.h>
 #include <linux/uaccess.h>
@@ -45,6 +46,8 @@ void ums_scheduler_release(struct ums_context *context);
 static inline int ums_scheduler_init(struct ums_data *data,
 				     struct ums_scheduler *sched)
 {
+	int retval;
+
 	ums_context_init(&sched->context);
 	sched->context.data = data;
 	sched->context.release = ums_scheduler_release;
@@ -53,9 +56,14 @@ static inline int ums_scheduler_init(struct ums_data *data,
 	INIT_LIST_HEAD(&sched->event_q);
 	init_waitqueue_head(&sched->sched_wait_q);
 
+	retval = ums_scheduler_proc_register(&data->dirs, sched);
+	if (retval)
+		return retval;
+
 	return rhashtable_insert_fast(&data->context_table,
 				      &sched->context.node,
 				      ums_context_params);
+
 }
 
 static inline struct ums_scheduler *ums_scheduler_create(struct ums_data *data)
@@ -89,6 +97,8 @@ void ums_scheduler_call_rcu(struct rcu_head *head)
 	context = container_of(head, struct ums_context, rcu_head);
 	scheduler = container_of(context, struct ums_scheduler, context);
 
+	ums_context_deinit(context);
+
 	free_ums_scheduler(scheduler);
 }
 
@@ -106,6 +116,9 @@ void ums_scheduler_destroy(struct ums_scheduler *sched)
 	spin_unlock(&sched->lock);
 
 	put_ums_complist(sched->complist);
+
+	ums_scheduler_proc_unregister(sched);
+
 	rhashtable_remove_fast(&sched->context.data->context_table,
 			       &sched->context.node,
 			       ums_context_params);
@@ -155,7 +168,8 @@ int enter_ums_scheduler_mode(struct ums_data *data,
 
 	startup_event->event.type = SCHEDULER_STARTUP;
 
-	enqueue_ums_sched_event(scheduler, startup_event);
+	enqueue_ums_sched_event(scheduler, startup_event,
+				EVENT_ADD_TAIL);
 
 	return 0;
 
@@ -167,10 +181,14 @@ sched_create:
 }
 
 void enqueue_ums_sched_event(struct ums_scheduler *scheduler,
-			    struct ums_event_node *event)
+			    struct ums_event_node *event,
+			    unsigned int flags)
 {
 	spin_lock(&scheduler->lock);
-	list_add_tail(&event->list, &scheduler->event_q);
+	if (flags & EVENT_ADD_HEAD)
+		list_add(&event->list, &scheduler->event_q);
+	else if (flags & EVENT_ADD_TAIL)
+		list_add_tail(&event->list, &scheduler->event_q);
 	spin_unlock(&scheduler->lock);
 
 	// notify new event
@@ -248,7 +266,7 @@ int ums_sched_dqevent(struct ums_data *data,
 
 	return 0;
 copy_user:
-	enqueue_ums_sched_event(scheduler, e);
+	enqueue_ums_sched_event(scheduler, e, EVENT_ADD_HEAD);
 out:
 	rcu_read_unlock();
 	return retval;
@@ -259,6 +277,8 @@ int exec_ums_context(struct ums_data *data, pid_t worker_pid)
 	pid_t context_pid;
 	struct ums_context *sched_context;
 	struct ums_context *worker_context;
+	struct ums_scheduler *scheduler;
+	struct ums_worker *worker;
 	int retval;
 
 	// find worker
@@ -281,6 +301,11 @@ int exec_ums_context(struct ums_data *data, pid_t worker_pid)
 		retval = -ESRCH;
 		goto out;
 	}
+
+	scheduler = container_of(sched_context, struct ums_scheduler, context);
+	worker = container_of(worker_context, struct ums_worker, context);
+
+	ums_scheduler_proc_unregister_worker(&scheduler->dirs, &worker->dirs);
 
 	prepare_switch_context(sched_context, worker_context);
 	rcu_read_unlock();

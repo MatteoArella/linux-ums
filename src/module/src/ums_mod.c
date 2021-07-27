@@ -20,8 +20,14 @@ static int __init ums_init(void)
 	if (retval)
 		goto register_dev;
 
+	retval = ums_proc_init();
+	if (retval)
+		goto proc_init;
+
 	return 0;
 
+proc_init:
+	unregister_ums_device();
 register_dev:
 	ums_caches_destroy();
 cache_init:
@@ -32,6 +38,7 @@ static void __exit ums_exit(void)
 {
 	unregister_ums_device();
 	ums_caches_destroy();
+	ums_proc_destroy();
 }
 
 MODULE_LICENSE("GPL");

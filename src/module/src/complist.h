@@ -9,6 +9,9 @@
 #include <linux/list.h>
 #include <linux/kref.h>
 
+#define COMPLIST_ADD_HEAD		1U
+#define COMPLIST_ADD_TAIL		2U
+
 struct ums_complist {
 	ums_comp_list_id_t id;
 	/* list_head to first ums_context */
@@ -24,7 +27,7 @@ int create_ums_completion_list(struct ums_data *data,
 			       ums_comp_list_id_t __user *id);
 
 void ums_completion_list_add(struct ums_complist *complist,
-			     struct ums_context *context);
+			     struct ums_context *context, unsigned int flags);
 
 int ums_complist_dqcontext(struct ums_data *data,
 			   struct dequeue_ums_complist_args __user *args);
