@@ -8,7 +8,7 @@
 #include <sched.h>
 #include <pthread.h>
 
-#include "../util/list.h"
+#include "list.h"
 
 struct context_list_node {
 	ums_context_t context;

@@ -4,5 +4,9 @@ if BUILD_EXAMPLES
   MAYBE_EXAMPLES = examples
 endif
 
-SUBDIRS = src/module src/lib $(MAYBE_EXAMPLES)
+if BUILD_BENCHMARK
+  MAYBE_BENCHMARK = benchmark
+endif
+
+SUBDIRS = src/module src/lib src/util $(MAYBE_EXAMPLES) $(MAYBE_BENCHMARK)
 EXTRA_DIST = autogen.sh LICENSE

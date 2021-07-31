@@ -24,9 +24,18 @@ AC_ARG_ENABLE([examples],
     [enable_examples=no])
 AM_CONDITIONAL([BUILD_EXAMPLES], [test x$enable_examples != xno])
 
-AC_CONFIG_FILES([Makefile])
+AC_ARG_ENABLE([benchmark],
+    [AS_HELP_STRING([--enable-benchmark], [Build benchmark])],
+    [],
+    [enable_benchmark=no])
+AM_CONDITIONAL([BUILD_BENCHMARK], [test x$enable_benchmark != xno])
+
+AC_CONFIG_FILES([Makefile src/util/Makefile])
 
 # Call configure scripts recursively
 AC_CONFIG_SUBDIRS([src/module src/lib examples])
+AS_IF([test x$enable_benchmark != xno ], [
+    AC_CONFIG_SUBDIRS([benchmark])
+])
 
 AC_OUTPUT
