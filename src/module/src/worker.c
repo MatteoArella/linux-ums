@@ -120,7 +120,7 @@ worker_create:
 	return retval;
 }
 
-int ums_thread_yield(struct ums_data *data, void __user *args)
+int ums_worker_yield(struct ums_data *data, void __user *args)
 {
 	pid_t context_pid;
 	struct ums_context *sched_context;
@@ -170,7 +170,7 @@ int ums_thread_yield(struct ums_data *data, void __user *args)
 	return 0;
 }
 
-int ums_thread_end(struct ums_data *data)
+int ums_worker_end(struct ums_data *data)
 {
 	pid_t context_pid;
 	struct ums_context *sched_context;

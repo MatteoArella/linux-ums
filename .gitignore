@@ -131,4 +131,8 @@ build-aux
 libtool
 
 # http://www.gnu.org/software/m4/
-m4
+m4/*
+!m4/ac_latex.m4
+!m4/ac_doxygen.m4
+!m4/ac_sphinx.m4
+!m4/ac_docs_enable.m4

@@ -1,0 +1,6 @@
+DOXYGEN_OUTPUT = $(top_builddir)/doxygen
+
+MOSTLYCLEANFILES = -r $(DOXYGEN_OUTPUT)
+
+doxygen-doc:
+	@$(DOXYGEN)

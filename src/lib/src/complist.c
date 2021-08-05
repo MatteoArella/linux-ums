@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 #include "private.h"
 
 int create_ums_completion_list(ums_completion_list_t *completion_list)

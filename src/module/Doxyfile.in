@@ -1,0 +1,18 @@
+PROJECT_NAME           = @PACKAGE_NAME@
+PROJECT_NUMBER         = @PACKAGE_VERSION@
+INPUT                  = @srcdir@
+RECURSIVE              = YES
+OUTPUT_DIRECTORY       = @top_builddir@/doxygen
+
+EXTRACT_ALL            = YES
+EXTRACT_STATIC         = YES
+
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+PREDEFINED             = __attribute__(x)= __rcu= __user=
+
+GENERATE_XML           = YES
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+HAVE_DOT               = NO

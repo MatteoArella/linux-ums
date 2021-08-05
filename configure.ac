@@ -30,10 +30,20 @@ AC_ARG_ENABLE([benchmark],
     [enable_benchmark=no])
 AM_CONDITIONAL([BUILD_BENCHMARK], [test x$enable_benchmark != xno])
 
-AC_CONFIG_FILES([Makefile src/util/Makefile])
+AC_DOCS_ENABLE
+
+AC_CONFIG_FILES([Makefile
+                 src/util/Makefile])
+AS_IF([test x$enable_docs != xno ], [
+    AC_CONFIG_FILES([doc/conf.py
+                     doc/Makefile])
+])
 
 # Call configure scripts recursively
-AC_CONFIG_SUBDIRS([src/module src/lib examples])
+AC_CONFIG_SUBDIRS([src/module src/lib])
+AS_IF([test x$enable_examples != xno ], [
+    AC_CONFIG_SUBDIRS([examples])
+])
 AS_IF([test x$enable_benchmark != xno ], [
     AC_CONFIG_SUBDIRS([benchmark])
 ])

@@ -27,6 +27,8 @@ AS_IF([test "x$CPPCHECK" = xtrue], [
 # Use the C language and compiler for the following checks
 AC_LANG([C])
 
+AC_DOCS_ENABLE
+
 # Checks for header files.
 AC_CHECK_HEADERS_ONCE([ features.h
                         pthread.h
@@ -45,5 +47,8 @@ AC_SEARCH_LIBS([pthread_create], [pthread])
 AC_CONFIG_FILES([libums.pc
                  Makefile
                  include/Makefile])
+AS_IF([test x$enable_docs != xno ], [
+    AC_CONFIG_FILES([Doxyfile])
+])
 
 AC_OUTPUT

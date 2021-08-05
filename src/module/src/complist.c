@@ -44,8 +44,8 @@ static inline void ums_complist_deinit(struct ums_data *data,
 	IDR_L_REMOVE(&data->comp_lists, complist->id);
 }
 
-int create_ums_completion_list(struct ums_data *data,
-			       ums_comp_list_id_t __user *id)
+int create_ums_complist(struct ums_data *data,
+			ums_comp_list_id_t __user *id)
 {
 	struct ums_complist *complist;
 	int retval;

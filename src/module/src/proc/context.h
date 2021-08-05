@@ -6,8 +6,24 @@
 #include "../context.h"
 #include <linux/string.h>
 
+/**
+ * @brief Get a string representation of the UMS context state
+ *
+ * @param[in] context		pointer to the UMS context
+ *
+ * @return			the context state representation
+ */
 const char *get_context_state(struct ums_context *context);
 
+/**
+ * @brief Get a string representation of the UMS context
+ *
+ * @param[in,out] buf		pointer to an allocated buffer
+ * @param[in] size		maximum number of bytes to write
+ * @param[in] context		pointer to the UMS context
+ *
+ * @return			the number of characters printed or truncated
+ */
 static inline int context_snprintf(char *buf, size_t size,
 				   struct ums_context *context)
 {

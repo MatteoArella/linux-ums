@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 #define _GNU_SOURCE
 
 #include <ums.h>
@@ -83,7 +85,6 @@ static inline void execute_next_context(void)
 	free(node);
 }
 
-/* TODO: */
 static void sched_entry_proc(ums_reason_t reason,
 			     ums_activation_t *activation,
 			     void *args)

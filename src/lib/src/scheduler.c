@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 #include "private.h"
 
 static inline int dequeue_ums_sched_event(struct ums_sched_event *event)
@@ -61,7 +63,7 @@ int enter_ums_scheduling_mode(
 	return 0;
 }
 
-int execute_ums_thread(ums_context_t ums_context)
+int execute_ums_thread(ums_context_t context)
 {
-	return ioctl(UMS_FILENO, IOCTL_EXEC_UMS_CTX, ums_context);
+	return ioctl(UMS_FILENO, IOCTL_EXEC_UMS_CTX, context);
 }

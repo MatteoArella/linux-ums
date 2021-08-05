@@ -28,3 +28,14 @@ static-check:
 check-local: static-check
 
 .PHONY: static-check
+
+if BUILD_DOCS
+include ../../aminclude.am
+
+html-local: doxygen-doc
+
+if HAVE_LATEX
+pdf-local: doxygen-doc
+endif
+
+endif

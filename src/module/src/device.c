@@ -106,7 +106,9 @@ static int ums_dev_release(struct inode *inode, struct file *filp)
 				    release_scheduler,
 				    NULL);
 
+	rcu_read_lock();
 	IDR_L_FOR_EACH(&ums_data->comp_lists, release_complist, NULL);
+	rcu_read_unlock();
 	IDR_L_DESTROY(&ums_data->comp_lists);
 
 	ums_proc_dirs_destroy(&ums_data->dirs);
@@ -125,7 +127,7 @@ static long ums_dev_ioctl(struct file *filp,
 
 	switch (cmd) {
 	case IOCTL_CREATE_UMS_CLIST:
-		retval = create_ums_completion_list(
+		retval = create_ums_complist(
 				(struct ums_data *) filp->private_data,
 				(ums_comp_list_id_t __user *) arg);
 		break;
@@ -157,12 +159,12 @@ static long ums_dev_ioctl(struct file *filp,
 			(struct ums_data *) filp->private_data, arg);
 		break;
 	case IOCTL_UMS_YIELD:
-		retval = ums_thread_yield(
+		retval = ums_worker_yield(
 			(struct ums_data *) filp->private_data,
 			(void __user *) arg);
 		break;
 	case IOCTL_EXIT_UMS:
-		retval = ums_thread_end(
+		retval = ums_worker_end(
 			(struct ums_data *) filp->private_data);
 		break;
 	default:

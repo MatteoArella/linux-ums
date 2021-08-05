@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 #include "private.h"
 
 typedef struct worker_proc_args_s {

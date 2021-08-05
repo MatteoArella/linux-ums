@@ -46,6 +46,8 @@ LT_INIT
 # Use the C language and compiler for the following checks
 AC_LANG([C])
 
+AC_DOCS_ENABLE
+
 # Checks for header files.
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -54,5 +56,8 @@ AC_LANG([C])
 
 AC_CONFIG_FILES([Makefile
                  src/uapi/Makefile])
+AS_IF([test x$enable_docs != xno ], [
+    AC_CONFIG_FILES([Doxyfile])
+])
 
 AC_OUTPUT

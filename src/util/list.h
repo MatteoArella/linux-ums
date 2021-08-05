@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: AGPL-3.0-only */
+
 #ifndef LIST_H
 #define LIST_H
 

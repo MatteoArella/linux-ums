@@ -82,3 +82,14 @@ lint: $(lint_dummy_SOURCES)
 check-local: lint
 
 FORCE:
+
+if BUILD_DOCS
+include ../../aminclude.am
+
+html-local: doxygen-doc
+
+if HAVE_LATEX
+pdf-local: doxygen-doc
+endif
+
+endif

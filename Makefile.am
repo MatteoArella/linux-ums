@@ -8,5 +8,9 @@ if BUILD_BENCHMARK
   MAYBE_BENCHMARK = benchmark
 endif
 
-SUBDIRS = src/module src/lib src/util $(MAYBE_EXAMPLES) $(MAYBE_BENCHMARK)
+if BUILD_DOCS
+  MAYBE_DOCS = doc
+endif
+
+SUBDIRS = src/module src/lib src/util $(MAYBE_EXAMPLES) $(MAYBE_BENCHMARK) $(MAYBE_DOCS)
 EXTRA_DIST = autogen.sh LICENSE
