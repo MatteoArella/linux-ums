@@ -3,7 +3,7 @@
 
 #include <pthread.h>
 
-typedef int ums_context_t;
+typedef pid_t ums_context_t;
 
 typedef int ums_completion_list_t;
 

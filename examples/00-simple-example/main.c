@@ -49,7 +49,7 @@ static struct context_list_node *get_next_context(void)
 
 	list_add_tail(&node->list, &rq.head);
 
-	while ((context = get_next_ums_list_item(context)) != -1) {
+	while ((context = get_next_ums_list_item(context)) > 0) {
 		node = malloc(sizeof(*node));
 		if (!node)
 			return NULL;
@@ -159,11 +159,12 @@ int initialize_ums_scheduling(pthread_t *sched_threads,
 			goto out;
 
 		if (pthread_create(sched_threads + i,
-				  &attr,
-				  sched_pthread_proc,
-				  NULL))
+				   &attr,
+				   sched_pthread_proc,
+				   NULL))
 			goto out;
 	}
+
 	return 0;
 out:
 	delete_ums_completion_list(&comp_list);

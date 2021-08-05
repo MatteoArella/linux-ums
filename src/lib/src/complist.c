@@ -37,10 +37,11 @@ ums_context_t get_next_ums_list_item(ums_context_t context)
 	retval = ioctl(UMS_FILENO,
 		       IOCTL_NEXT_UMS_CTX_LIST,
 		       &next_context_args);
-	if (!retval)
-		return next_context_args.ums_next_context;
+	if (retval)
+		return retval;
 
-	return retval;
+	return next_context_args.ums_next_context == -1 ? 0 :
+			next_context_args.ums_next_context;
 }
 
 int delete_ums_completion_list(ums_completion_list_t *completion_list)
