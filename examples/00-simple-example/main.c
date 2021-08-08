@@ -22,16 +22,6 @@ struct ums_sched_rq {
 ums_completion_list_t comp_list;
 __thread struct ums_sched_rq rq;
 
-static inline void cleanup_handler(void *arg)
-{
-	struct context_list_node *node, *tmp;
-
-	list_for_each_entry_safe(node, tmp, &rq.head, list) {
-		list_del(&node->list);
-		free(node);
-	}
-}
-
 static struct context_list_node *get_next_context(void)
 {
 	ums_context_t context;
@@ -138,12 +128,8 @@ static void *sched_pthread_proc(void *arg)
 
 	INIT_LIST_HEAD(&rq.head);
 
-	pthread_cleanup_push(cleanup_handler, NULL);
-
 	if (enter_ums_scheduling_mode(&sched_info))
 		perror("enter_ums_scheduling_mode");
-
-	pthread_cleanup_pop(1);
 
 	return NULL;
 }
@@ -156,10 +142,10 @@ int initialize_ums_scheduling(pthread_t *sched_threads,
 	long i;
 
 	if (pthread_attr_init(&attr))
-		goto err;
+		return -1;
 
 	if (create_ums_completion_list(&comp_list))
-		goto err;
+		return -1;
 
 	for (i = 0L; i < nthreads; i++) {
 		CPU_ZERO(&cpus);
@@ -167,40 +153,27 @@ int initialize_ums_scheduling(pthread_t *sched_threads,
 		if (pthread_attr_setaffinity_np(&attr,
 						sizeof(cpu_set_t),
 						&cpus))
-			goto comp_list_create;
+			goto out;
+		if (pthread_attr_setdetachstate(&attr,
+						PTHREAD_CREATE_DETACHED))
+			goto out;
 
 		if (pthread_create(sched_threads + i,
 				  &attr,
 				  sched_pthread_proc,
 				  NULL))
-			goto pthread_create;
+			goto out;
 	}
 	return 0;
-
-pthread_create:
-	for (; i > 0; i--) {
-		pthread_cancel(sched_threads[i - 1]);
-		pthread_join(sched_threads[i - 1], NULL);
-	}
-comp_list_create:
+out:
 	delete_ums_completion_list(&comp_list);
-err:
 	return -1;
 }
 
 int release_ums_scheduling(pthread_t *sched_threads,
 			   long nthreads)
 {
-	long i;
-
-	for (i = 0L; i < nthreads; i++) {
-		pthread_cancel(sched_threads[i]);
-		pthread_join(sched_threads[i], NULL);
-	}
-
-	delete_ums_completion_list(&comp_list);
-
-	return 0;
+	return delete_ums_completion_list(&comp_list);
 }
 
 int create_ums_worker_thread(pthread_t *thread, void *(*func)(void *),
@@ -243,11 +216,12 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	for (i = 0L; i < nworkers; i++)
+	for (i = 0L; i < nworkers; i++) {
 		if (create_ums_worker_thread(workers + i,
 					     worker_pthread_proc,
 					     (void *) i))
 			perror("create_ums_worker_thread");
+	}
 
 	for (i = 0L; i < nworkers; i++)
 		pthread_join(workers[i], NULL);

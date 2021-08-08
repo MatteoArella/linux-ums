@@ -18,9 +18,6 @@ int enter_ums_scheduling_mode(
 	if (enter_ums_mode(&enter_args))
 		return -1;
 
-	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
-
 	for (;;) {
 		if (dequeue_ums_sched_event(&event)) {
 			if (errno == EINTR) continue;
