@@ -95,8 +95,6 @@ static void sched_entry_proc(ums_reason_t reason,
 	case UMS_SCHEDULER_STARTUP:
 		execute_next_context();
 		break;
-	case UMS_SCHEDULER_THREAD_BLOCKED:
-		break;
 	case UMS_SCHEDULER_THREAD_YIELD:
 		context = activation->context;
 		worker_result = *((long *) args);

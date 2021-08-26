@@ -33,8 +33,6 @@ int enter_ums_scheduling_mode(
 				scheduler_startup_info->scheduler_param
 			);
 			break;
-		case THREAD_BLOCKED:
-			break;
 		case THREAD_YIELD:
 			scheduler_activation.context =
 						event.yield_params.context;

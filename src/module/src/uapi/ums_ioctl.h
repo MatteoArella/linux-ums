@@ -16,7 +16,6 @@ struct enter_ums_mode_args {
 
 typedef enum ums_sched_event_type_e {
 	SCHEDULER_STARTUP = 0,
-	THREAD_BLOCKED,
 	THREAD_YIELD,
 	THREAD_TERMINATED
 } ums_sched_event_type_t;
