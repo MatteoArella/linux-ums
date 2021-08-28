@@ -52,6 +52,7 @@ AC_LANG([C])
 
 # Checks for library functions.
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile
+                 src/uapi/Makefile])
 
 AC_OUTPUT

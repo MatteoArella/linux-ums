@@ -3,7 +3,7 @@
 #ifndef UMS_DEVICE_H
 #define UMS_DEVICE_H
 
-#include "uapi/ums_ioctl.h"
+#include "uapi/ums/ums_ioctl.h"
 
 int register_ums_device(void);
 

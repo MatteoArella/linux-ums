@@ -3,7 +3,7 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
-#include "uapi/ums_ioctl.h"
+#include "uapi/ums/ums_ioctl.h"
 
 #include "ums.h"
 #include "context.h"

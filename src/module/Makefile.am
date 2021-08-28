@@ -30,7 +30,7 @@ lint_dummy_SOURCES = \
 
 automake_dummy_SOURCES = \
 	$(lint_dummy_SOURCES) \
-	src/uapi/ums_ioctl.h
+	src/uapi/ums/ums_ioctl.h
 
 module_DATA = ums.o
 module_objs = ums_mod.o \
@@ -47,6 +47,8 @@ module_objs = ums_mod.o \
 
 MODULE_EXTRA_CFLAGS = $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -Wall -Werror
+
+SUBDIRS = src/uapi
 
 export MODULE_EXTRA_CFLAGS module_DATA module_objs
 

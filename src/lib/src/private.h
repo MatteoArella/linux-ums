@@ -3,7 +3,7 @@
 
 #include "../include/ums.h"
 
-#include "ums_ioctl.h"
+#include "ums/ums_ioctl.h"
 
 #include <stddef.h>
 #include <stdlib.h>

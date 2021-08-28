@@ -3,7 +3,7 @@
 #ifndef UMS_H
 #define UMS_H
 
-#include "uapi/ums_ioctl.h"
+#include "uapi/ums/ums_ioctl.h"
 #include "log.h"
 #include "idr_l.h"
 #include "proc/base.h"
