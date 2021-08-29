@@ -5,4 +5,4 @@ if BUILD_EXAMPLES
 endif
 
 SUBDIRS = src/module src/lib $(MAYBE_EXAMPLES)
-EXTRA_DIST = autogen.sh
+EXTRA_DIST = autogen.sh LICENSE

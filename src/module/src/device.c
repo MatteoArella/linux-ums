@@ -44,27 +44,45 @@ static int ums_dev_open(struct inode *inode, struct file *filp)
 
 	IDR_L_INIT(&ums_data->comp_lists);
 
-	retval = rhashtable_init(&ums_data->context_table,
+	retval = rhashtable_init(&ums_data->schedulers,
 				 &ums_context_params);
 	if (unlikely(retval))
-		goto rhashtable_init;
+		goto schedulers_init;
+
+	retval = rhashtable_init(&ums_data->workers,
+				 &ums_context_params);
+	if (unlikely(retval))
+		goto workers_init;
 
 	filp->private_data = ums_data;
 
 	return 0;
 
-rhashtable_init:
+workers_init:
+	rhashtable_destroy(&ums_data->schedulers);
+schedulers_init:
 	ums_proc_dirs_destroy(&ums_data->dirs);
 proc_dirs_init:
 	kfree(ums_data);
 	return retval;
 }
 
-static void release_context(void *ptr, void *arg)
+static void release_worker(void *ptr, void *arg)
 {
 	struct ums_context *context = ptr;
+	struct ums_worker *worker;
 
-	context->release(context);
+	worker = container_of(context, struct ums_worker, context);
+	ums_worker_destroy(worker);
+}
+
+static void release_scheduler(void *ptr, void *arg)
+{
+	struct ums_context *context = ptr;
+	struct ums_scheduler *scheduler;
+
+	scheduler = container_of(context, struct ums_scheduler, context);
+	ums_scheduler_destroy(scheduler);
 }
 
 static int release_complist(int id, void *complist, void *data)
@@ -80,8 +98,12 @@ static int ums_dev_release(struct inode *inode, struct file *filp)
 	ums_data = filp->private_data;
 
 	// destroy all
-	rhashtable_free_and_destroy(&ums_data->context_table,
-				    release_context,
+	rhashtable_free_and_destroy(&ums_data->workers,
+				    release_worker,
+				    NULL);
+
+	rhashtable_free_and_destroy(&ums_data->schedulers,
+				    release_scheduler,
 				    NULL);
 
 	IDR_L_FOR_EACH(&ums_data->comp_lists, release_complist, NULL);

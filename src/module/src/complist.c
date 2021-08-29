@@ -172,7 +172,7 @@ int ums_complist_dqcontext(struct ums_data *data,
 
 	scheduler_pid = current_context_pid();
 
-	sched_context = rhashtable_lookup_fast(&data->context_table,
+	sched_context = rhashtable_lookup_fast(&data->schedulers,
 					       &scheduler_pid,
 					       ums_context_params);
 	if (unlikely(!sched_context)) {
@@ -235,7 +235,7 @@ int ums_complist_next_context(struct ums_data *data,
 
 	// find worker
 	rcu_read_lock();
-	context = rhashtable_lookup_fast(&data->context_table,
+	context = rhashtable_lookup_fast(&data->workers,
 					 &worker_pid,
 					 ums_context_params);
 	if (unlikely(!context)) {

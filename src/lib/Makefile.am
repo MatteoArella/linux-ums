@@ -10,6 +10,9 @@ libums_la_SOURCES = \
 	src/scheduler.c \
 	src/worker.c
 
+EXTRA_DIST = \
+	src/private.h
+
 libums_la_CFLAGS = -I$(srcdir)/include -I$(srcdir)/../module/src/uapi
 
 libums_la_LDFLAGS = -version-info 0:0:0

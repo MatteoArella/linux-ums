@@ -15,7 +15,8 @@
 
 struct ums_data {
 	struct idr_l comp_lists;
-	struct rhashtable context_table;
+	struct rhashtable schedulers;
+	struct rhashtable workers;
 	struct ums_proc_dirs dirs;
 };
 

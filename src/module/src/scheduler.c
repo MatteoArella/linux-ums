@@ -41,8 +41,6 @@ void free_ums_event(struct ums_event_node *event)
 	kmem_cache_free(ums_event_cache, event);
 }
 
-void ums_scheduler_release(struct ums_context *context);
-
 static inline int ums_scheduler_init(struct ums_data *data,
 				     struct ums_scheduler *sched)
 {
@@ -50,7 +48,6 @@ static inline int ums_scheduler_init(struct ums_data *data,
 
 	ums_context_init(&sched->context);
 	sched->context.data = data;
-	sched->context.release = ums_scheduler_release;
 
 	spin_lock_init(&sched->lock);
 	INIT_LIST_HEAD(&sched->event_q);
@@ -60,7 +57,7 @@ static inline int ums_scheduler_init(struct ums_data *data,
 	if (retval)
 		return retval;
 
-	return rhashtable_insert_fast(&data->context_table,
+	return rhashtable_insert_fast(&data->schedulers,
 				      &sched->context.node,
 				      ums_context_params);
 
@@ -119,19 +116,10 @@ void ums_scheduler_destroy(struct ums_scheduler *sched)
 
 	ums_scheduler_proc_unregister(sched);
 
-	rhashtable_remove_fast(&sched->context.data->context_table,
+	rhashtable_remove_fast(&sched->context.data->schedulers,
 			       &sched->context.node,
 			       ums_context_params);
 	call_rcu(&sched->context.rcu_head, ums_scheduler_call_rcu);
-}
-
-void ums_scheduler_release(struct ums_context *context)
-{
-	struct ums_scheduler *scheduler;
-
-	scheduler = container_of(context, struct ums_scheduler, context);
-
-	ums_scheduler_destroy(scheduler);
 }
 
 int enter_ums_scheduler_mode(struct ums_data *data,
@@ -236,7 +224,7 @@ int ums_sched_dqevent(struct ums_data *data,
 	context_pid = current_context_pid();
 
 	rcu_read_lock();
-	sched_context = rhashtable_lookup_fast(&data->context_table,
+	sched_context = rhashtable_lookup_fast(&data->schedulers,
 					       &context_pid,
 					       ums_context_params);
 	if (unlikely(!sched_context)) {
@@ -283,7 +271,7 @@ int exec_ums_context(struct ums_data *data, pid_t worker_pid)
 
 	// find worker
 	rcu_read_lock();
-	worker_context = rhashtable_lookup_fast(&data->context_table,
+	worker_context = rhashtable_lookup_fast(&data->workers,
 						&worker_pid,
 						ums_context_params);
 	if (unlikely(!worker_context)) {
@@ -294,7 +282,7 @@ int exec_ums_context(struct ums_data *data, pid_t worker_pid)
 	// find current scheduler
 	context_pid = current_context_pid();
 
-	sched_context = rhashtable_lookup_fast(&data->context_table,
+	sched_context = rhashtable_lookup_fast(&data->schedulers,
 					       &context_pid,
 					       ums_context_params);
 	if (unlikely(!sched_context)) {

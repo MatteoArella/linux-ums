@@ -17,8 +17,6 @@ static inline void free_ums_worker(struct ums_worker *worker)
 	kfree(worker);
 }
 
-void ums_worker_release(struct ums_context *context);
-
 static inline int ums_worker_init(struct ums_data *data,
 				  struct ums_worker *worker)
 {
@@ -26,13 +24,12 @@ static inline int ums_worker_init(struct ums_data *data,
 
 	ums_context_init(&worker->context);
 	worker->context.data = data;
-	worker->context.release = ums_worker_release;
 
 	retval = ums_worker_proc_register(&data->dirs, worker);
 	if (unlikely(retval))
 		return retval;
 
-	return rhashtable_insert_fast(&data->context_table,
+	return rhashtable_insert_fast(&data->workers,
 				      &worker->context.node,
 				      ums_context_params);
 }
@@ -79,18 +76,10 @@ void ums_worker_destroy(struct ums_worker *worker)
 
 	ums_worker_proc_unregister(worker);
 
-	rhashtable_remove_fast(&worker->context.data->context_table,
+	rhashtable_remove_fast(&worker->context.data->workers,
 			       &worker->context.node,
 			       ums_context_params);
 	call_rcu(&worker->context.rcu_head, ums_worker_call_rcu);
-}
-
-void ums_worker_release(struct ums_context *context)
-{
-	struct ums_worker *worker;
-
-	worker = container_of(context, struct ums_worker, context);
-	ums_worker_destroy(worker);
 }
 
 int enter_ums_worker_mode(struct ums_data *data,
@@ -144,7 +133,7 @@ int ums_thread_yield(struct ums_data *data, void __user *args)
 	context_pid = current_context_pid();
 
 	rcu_read_lock();
-	worker_context = rhashtable_lookup_fast(&data->context_table,
+	worker_context = rhashtable_lookup_fast(&data->workers,
 						&context_pid,
 						ums_context_params);
 	if (unlikely(!worker_context)) {
@@ -195,7 +184,7 @@ int ums_thread_end(struct ums_data *data)
 	context_pid = current_context_pid();
 
 	rcu_read_lock();
-	worker_context = rhashtable_lookup_fast(&data->context_table,
+	worker_context = rhashtable_lookup_fast(&data->workers,
 						&context_pid,
 						ums_context_params);
 	if (unlikely(!worker_context)) {

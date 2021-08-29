@@ -35,7 +35,6 @@ struct ums_context {
 	struct list_head list;
 	struct rcu_head rcu_head;
 	struct ums_data *data;
-	void (*release)(struct ums_context *context);
 };
 
 const static struct rhashtable_params ums_context_params = {
