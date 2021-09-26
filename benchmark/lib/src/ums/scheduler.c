@@ -2,7 +2,7 @@
 
 #define _GNU_SOURCE
 
-#include "ums/benchmark/ums/scheduler.h"
+#include "scheduler.h"
 
 #include <stdlib.h>
 #include <pthread.h>
@@ -10,21 +10,13 @@
 struct ums_scheduler {
 	pthread_t thread;
 	ums_scheduler_startup_info_t startup_info;
-	void (*cleanup_routine)(void *args);
 };
-
-void default_cleanup_routine(void *args) {}
 
 static void *sched_pthread_proc(void *arg)
 {
 	struct ums_scheduler *scheduler = arg;
 
-	pthread_cleanup_push(scheduler->cleanup_routine,
-			     NULL);
-
 	enter_ums_scheduling_mode(&scheduler->startup_info);
-
-	pthread_cleanup_pop(1);
 
 	return NULL;
 }
@@ -39,8 +31,6 @@ ums_scheduler_t *ums_scheduler_create(ums_scheduler_props_t *props)
 		return NULL;
 
 	scheduler->startup_info = props->startup_info;
-	scheduler->cleanup_routine = props->cleanup_routine ?
-			props->cleanup_routine : default_cleanup_routine;
 
 	if (pthread_attr_init(&attr))
 		goto out;

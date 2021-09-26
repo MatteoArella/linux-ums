@@ -12,7 +12,6 @@ typedef struct ums_scheduler ums_scheduler_t;
 
 typedef struct ums_scheduler_props_s {
 	cpu_set_t cpu_set;
-	void (*cleanup_routine)(void *args);
 	ums_scheduler_startup_info_t startup_info;
 } ums_scheduler_props_t;
 

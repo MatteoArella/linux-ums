@@ -5,6 +5,8 @@
 #include <getopt.h>
 
 #include "ums/benchmark/suite.h"
+#include "ums/benchmark/ums_suite.h"
+#include "ums/benchmark/pthread_suite.h"
 #include "ums/model.h"
 #include "pthread/model.h"
 
@@ -32,7 +34,7 @@ static inline void print_usage(FILE *file)
 		"Usage: %s [OPTION]... <ums|pthread>\n"
 		"\n"
 		"Options:\n"
-		"  -t, --task=prime             Choose benchmark task type\n"
+		"  -t, --task=TASK              Choose benchmark task type: [prime]\n"
 		"  -w, --workers=NUM            Choose the number of workers"
 						" to be run\n"
 		"  -h, --help                   Show this help and exit\n"
@@ -44,13 +46,11 @@ static inline void print_usage(FILE *file)
 
 int main(int argc, char **argv)
 {
-	benchmark_suite_t	*suite;
+	benchmark_suite_t *suite;
 	benchmark_suite_props_t props;
 	benchmark_suite_ums_props_t ums_props = {
 		.complist = &comp_list,
-		.scheduler_props = {
-			.sched_proc = sched_entry_proc
-		}
+		.sched_proc = sched_entry_proc
 	};
 	benchmark_suite_pthread_props_t pthread_props;
 	int c, retval;
@@ -104,26 +104,11 @@ int main(int argc, char **argv)
 	switch (task_type) {
 	case PRIME:
 		task_input = 0xE423UL; // 16bit prime number
-		ums_props.worker_props.work_proc =
-					primality_test_ums_worker_proc;
-		pthread_props.work_proc =
-					primality_test_pthread_worker_proc;
+		ums_props.work_proc = primality_test_ums_worker_proc;
+		pthread_props.work_proc = primality_test_pthread_worker_proc;
 		break;
 	default:
 		break;
-	}
-
-	if (!strcmp(argv[optind], "ums")) {
-		props.type = BENCHMARK_SUITE_UMS;
-		props.ums_props = ums_props;
-	} else if (!strcmp(argv[optind], "pthread")) {
-		props.type = BENCHMARK_SUITE_PTHREAD;
-		props.pthread_props = pthread_props;
-	} else {
-		fprintf(stderr,
-			"Benchmark type '%s' not valid\n",
-			argv[optind]);
-		return -1;
 	}
 
 	if (!n_workers) {
@@ -151,7 +136,19 @@ int main(int argc, char **argv)
 	props.n_tasks = n_workers;
 	props.tasks = tasks;
 
-	suite = benchmark_suite_create(&props);
+	if (!strcmp(argv[optind], "ums")) {
+		ums_props.base = props;
+		suite = (benchmark_suite_t *) benchmark_suite_ums_create(&ums_props);
+	} else if (!strcmp(argv[optind], "pthread")) {
+		pthread_props.base = props;
+		suite = (benchmark_suite_t *) benchmark_suite_pthread_create(&pthread_props);
+	} else {
+		fprintf(stderr,
+			"Benchmark type '%s' not valid\n",
+			argv[optind]);
+		return -1;
+	}
+
 	if (!suite) {
 		perror("benchmark_suite_create");
 		retval = -1;

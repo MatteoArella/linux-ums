@@ -6,14 +6,16 @@ lib_LTLIBRARIES = libums-benchmark.la
 
 libums_benchmark_la_SOURCES = \
 	src/suite.c \
-	src/timer.h \
+	src/suite.h \
 	src/timer.c \
+	src/timer.h \
 	src/ums/scheduler.c \
+	src/ums/scheduler.h \
 	src/ums/worker.c \
-	src/ums/suite.h \
+	src/ums/worker.h \
 	src/ums/suite.c \
 	src/pthread/worker.c \
-	src/pthread/suite.h \
+	src/pthread/worker.h \
 	src/pthread/suite.c
 
 libums_benchmark_la_CFLAGS = \

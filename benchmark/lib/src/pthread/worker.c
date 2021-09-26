@@ -2,7 +2,7 @@
 
 #define _GNU_SOURCE
 
-#include "ums/benchmark/pthread/worker.h"
+#include "worker.h"
 
 #include <stdlib.h>
 #include <pthread.h>
