@@ -13,20 +13,20 @@ usage() {
 Usage: $ME [OPTIONS]
 
 Options:
-    -i BUILD-DIR          use BUILD-DIR as input build directory
+    -o BUILD-DIR          use BUILD-DIR as output build directory
     -h                    show this help and exit
 EOF
 }
 
 BUILDDIR=$BASEDIR/build
 
-while getopts ":hi:" opt; do
+while getopts ":ho:" opt; do
   case "$opt" in
   h)
     usage
     exit 0
     ;;
-  i) BUILDDIR=$OPTARG ;;
+  o) BUILDDIR=$OPTARG ;;
   \?)
     echo "unknown option $OPTARG!" >&2
     usage >&2
@@ -41,7 +41,11 @@ while getopts ":hi:" opt; do
 done
 shift $(($OPTIND - 1))
 
+[ ! -f "$BASEDIR/configure" ] && $BASEDIR/autogen.sh
+
+mkdir -p $BUILDDIR
 cd $BUILDDIR
-sudo make install
-sudo ldconfig
-sudo modprobe ums
+
+$BASEDIR/configure
+
+sudo make -j $(nproc) V=1 distcheck

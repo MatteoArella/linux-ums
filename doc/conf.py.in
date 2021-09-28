@@ -20,7 +20,8 @@
 project = 'Linux User-Mode Scheduling'
 copyright = '2021, Arella Matteo'
 author = 'Arella Matteo'
-
+version = '@PACKAGE_VERSION@'
+release = '@PACKAGE_VERSION@'
 
 # -- General configuration ---------------------------------------------------
 

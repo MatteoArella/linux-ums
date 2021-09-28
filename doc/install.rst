@@ -10,16 +10,28 @@ Minimal Requirements
 - GNU make          >= 3.81
 - pkg-config
 - linux-headers
-- cppcheck\ [#f1]_
-- sphinx\ [#f2]_
-- doxygen\ [#f2]_
-- breathe\ [#f2]_
-- sphinx_rtd_theme\ [#f2]_
-- latex\ [#f3]_
+- sphinx\ [#f1]_
+- doxygen\ [#f1]_
+- breathe\ [#f1]_
+- sphinx_rtd_theme\ [#f1]_
+- latex\ [#f2]_
 
-.. [#f1] Optional: needed only for userspace library static code analysis
-.. [#f2] Optional: needed only to build the documentation
-.. [#f3] Optional: needed only to build the pdf documentation
+.. [#f1] Optional: needed only to build the documentation
+.. [#f2] Optional: needed only to build the pdf documentation
+
+Development Requirements
+========================
+
+The following dependencies are needed in case of development build:
+
+- autotools-dev
+- autoconf
+- automake
+- libtool
+- git
+- cppcheck\ [#f3]_
+
+.. [#f3] Optional: needed only for userspace library static code analysis
 
 Build
 =====
@@ -94,7 +106,6 @@ Targets
 ``uninstall``               Uninstall from the system
 ``clean``                   Delete all files in the current directory that are
                             normally created by building the program
-``distclean``               Delete all files in the current directory (or
-                            created by this makefile) that are created by
-                            configuring or building the program
+``distclean``               Delete all files in the current directory that are
+                            created by configuring or building the program
 ========================== ====================================================

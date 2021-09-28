@@ -47,12 +47,13 @@ shift $(($OPTIND - 1))
 [ ! -f "$BASEDIR/configure" ] && $BASEDIR/autogen.sh
 
 mkdir -p $BUILDDIR
-cd $BUILDDIR
 
-$BASEDIR/configure --enable-docs
+# make pdf two times for preventing any issues
+docker run -t --rm -u $UID -v $BASEDIR:$BASEDIR -w $BUILDDIR arella/aosv-latexpdf /bin/bash -c \
+  "$BASEDIR/configure --enable-docs && \
+  make -j $(nproc) V=1 html && \
+  make -j $(nproc) V=1 pdf && \
+  make -j $(nproc) V=1 pdf"
 
-make -j $(nproc) html
-make -j $(nproc) pdf
-
-mv doc/html $PUBLISHDIR
-cp doc/latex/linuxusermodescheduling.pdf $PUBLISHDIR
+mv $BUILDDIR/doc/html $PUBLISHDIR
+cp $BUILDDIR/doc/latex/linuxusermodescheduling.pdf $PUBLISHDIR

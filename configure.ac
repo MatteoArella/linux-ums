@@ -2,7 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([linux-ums], [1.0.0], [arella.matteo.95@gmail.com])
+m4_include([m4/version.m4])
+AC_INIT([linux-ums], [VERSION_NUMBER], [arella.matteo.95@gmail.com])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([build-aux])
 
@@ -33,19 +34,14 @@ AM_CONDITIONAL([BUILD_BENCHMARK], [test x$enable_benchmark != xno])
 AC_DOCS_ENABLE
 
 AC_CONFIG_FILES([Makefile
-                 src/util/Makefile])
-AS_IF([test x$enable_docs != xno ], [
-    AC_CONFIG_FILES([doc/conf.py
-                     doc/Makefile])
-])
+                 src/util/Makefile
+                 doc/conf.py
+                 doc/Makefile])
 
 # Call configure scripts recursively
-AC_CONFIG_SUBDIRS([src/module src/lib])
-AS_IF([test x$enable_examples != xno ], [
-    AC_CONFIG_SUBDIRS([examples])
-])
-AS_IF([test x$enable_benchmark != xno ], [
-    AC_CONFIG_SUBDIRS([benchmark])
-])
+AC_CONFIG_SUBDIRS([ src/module
+                    src/lib
+                    examples
+                    benchmark])
 
 AC_OUTPUT

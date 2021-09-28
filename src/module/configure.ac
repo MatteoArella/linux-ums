@@ -2,7 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([ums-kmod], [1.0.0], [arella.matteo.95@gmail.com])
+m4_include([../../m4/version.m4])
+AC_INIT([ums-kmod], [VERSION_NUMBER], [arella.matteo.95@gmail.com])
 AC_SUBST(PACKAGE_DESCRIPTION, ["User Mode Scheduling linux kernel module."])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([../../m4])
@@ -26,6 +27,8 @@ AS_IF([test "x$KERNELDIR" = x], [
 ], [])
 AC_SUBST([KERNELDIR])
 AC_SUBST([moduledir])
+
+AC_PATH_PROG([DEPMOD], [depmod], [/sbin/depmod], [$PATH:/sbin])
 
 # check if 'checkpatch.pl' script exists in PATH or in KERNELDIR
 AC_PATH_PROG([CHECKPATCH], [checkpatch.pl], [true])

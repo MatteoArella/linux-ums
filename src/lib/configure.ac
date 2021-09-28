@@ -2,7 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([libums], [1.0.0], [arella.matteo.95@gmail.com])
+m4_include([../../m4/version.m4])
+AC_INIT([libums], [VERSION_NUMBER], [arella.matteo.95@gmail.com])
 AC_SUBST(PACKAGE_DESCRIPTION, ["User Mode Scheduling library."])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([../../m4])

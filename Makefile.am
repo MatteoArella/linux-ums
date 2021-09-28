@@ -13,4 +13,4 @@ if BUILD_DOCS
 endif
 
 SUBDIRS = src/module src/lib src/util $(MAYBE_EXAMPLES) $(MAYBE_BENCHMARK) $(MAYBE_DOCS)
-EXTRA_DIST = autogen.sh LICENSE
+EXTRA_DIST = autogen.sh LICENSE m4/version.m4

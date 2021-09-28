@@ -33,17 +33,18 @@ automake_dummy_SOURCES = \
 	src/uapi/ums/ums_ioctl.h
 
 module_DATA = ums.o
-module_objs = ums_mod.o \
-			  complist.o \
-			  context.o \
-			  device.o \
-			  enter_ums.o \
-			  proc/base.o \
-			  proc/context.o \
-			  proc/scheduler.o \
-			  proc/worker.o \
-			  scheduler.o \
-			  worker.o
+module_objs = \
+	ums_mod.o \
+	complist.o \
+	context.o \
+	device.o \
+	enter_ums.o \
+	proc/base.o \
+	proc/context.o \
+	proc/scheduler.o \
+	proc/worker.o \
+	scheduler.o \
+	worker.o
 
 MODULE_EXTRA_CFLAGS = $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -Wall -Werror
@@ -63,15 +64,17 @@ $(module_DATA): $(automake_dummy_SOURCES) FORCE
 	$(MAKE) -C $(KERNELDIR) M=$(abs_builddir)/src modules
 
 install-moduleDATA: $(module_DATA)
-	@test -z "$(DESTDIR)$(moduledir)" ||\
-	    $(MKDIR_P) "$(DESTDIR)$(moduledir)"
+	@test -z $(DESTDIR)$(moduledir) || \
+		$(MKDIR_P) $(DESTDIR)$(moduledir)
 	$(INSTALL_DATA) $(abs_builddir)/src/ums.ko $(DESTDIR)$(moduledir)/ums.ko
-	depmod -a
-	modprobe ums
 
 uninstall-moduleDATA:
 	$(RM) $(DESTDIR)$(moduledir)/ums.ko
-	modprobe -r ums
+
+install-data-local: install-moduleDATA
+	$(DEPMOD) -a
+
+uninstall-local: uninstall-moduleDATA
 
 clean-local:
 	$(MAKE) -C $(KERNELDIR) M=$(abs_builddir)/src clean
