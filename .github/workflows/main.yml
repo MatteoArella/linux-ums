@@ -65,29 +65,7 @@ jobs:
     needs: [linux-x86_64, qemu-linux-x86_64]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
-
     name: release
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          lfs: true
-
-      - name: Build release package
-        run: scripts/linux/release.sh
-
-      - uses: marvinpinto/action-automatic-releases@latest
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          prerelease: false
-          files: |
-            build/linux-ums-*.tar.gz
-
-  deploy-docs:
-    needs: [release]
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    name: deploy docs
 
     steps:
       - uses: actions/checkout@v2
@@ -97,10 +75,22 @@ jobs:
       - name: Pull docker image
         run: docker pull arella/aosv-latexpdf
 
+      - name: Build release package
+        run: scripts/linux/release.sh
+
       - name: Build documentation
         run: scripts/linux/build_docs.sh
+
+      - name: Upload assets to release
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: false
+          files: |
+            build/linux-ums-*.tar.gz
 
       - name: Deploy documentation
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/public

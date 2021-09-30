@@ -20,7 +20,8 @@ EOF
 }
 
 BUILDDIR=$BASEDIR/build
-PUBLISHDIR=$BASEDIR/public
+PUBLISHDIR=$BUILDDIR/public
+VERSION_NUMBER=$($BASEDIR/scripts/build/version.sh)
 
 while getopts ":ho:p:" opt; do
   case "$opt" in
@@ -55,5 +56,10 @@ docker run -t --rm -u $UID -v $BASEDIR:$BASEDIR -w $BUILDDIR arella/aosv-latexpd
   make -j $(nproc) V=1 pdf && \
   make -j $(nproc) V=1 pdf"
 
-mv $BUILDDIR/doc/html $PUBLISHDIR
+cp -R $BUILDDIR/doc/html $PUBLISHDIR
 cp $BUILDDIR/doc/latex/linuxusermodescheduling.pdf $PUBLISHDIR
+
+cd $BUILDDIR/doc/html
+tar cvf $BUILDDIR/linux-ums-$VERSION_NUMBER-html.tar.gz .
+cd $BUILDDIR/doc/latex
+tar cvf $BUILDDIR/linux-ums-$VERSION_NUMBER-pdf.tar.gz linuxusermodescheduling.pdf
