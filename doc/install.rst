@@ -109,3 +109,12 @@ Targets
 ``distclean``               Delete all files in the current directory that are
                             created by configuring or building the program
 ========================== ====================================================
+
+Install
+=======
+
+.. code::
+
+    $ make install
+    $ sudo ldconfig
+    $ sudo modprobe ums

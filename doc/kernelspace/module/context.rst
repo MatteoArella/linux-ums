@@ -11,6 +11,9 @@ Every UMS context is used for indexing its UMS thread owner by means of the
 Both a :doc:`UMS scheduler <scheduler>` and a :doc:`UMS worker <worker>`
 contains their own UMS context.
 
+The UMS context implements all facilities for switching from UMS schedulers and
+UMS workers and viceversa.
+
 Defines
 -------
 

@@ -45,6 +45,17 @@ A PDF version of the documentation is also available [here](https://github.com/M
 
 <a name="f2">2</a> Optional: needed only to build the pdf documentation
 
+### Minimal Build
+
+Build the userspace library and the LKM and install them into the system with:
+```
+$ ./configure
+$ make
+$ make install
+$ sudo ldconfig
+$ sudo modprobe ums
+```
+
 ### Development requirements
 
 The following dependencies are needed in case of development build:
@@ -57,21 +68,6 @@ The following dependencies are needed in case of development build:
 - cppcheck <sup>[3](#f2)</sup>
 
 <a name="f3">3</a> Optional: needed only for userspace library static code analysis
-
-### Minimal Build
-
-Build the userspace library and the LKM and install them into the system with:
-```
-$ ./configure
-$ make
-$ make install
-```
-
-Add the ``UMS`` module to the Linux Kernel (run as superuser):
-
-```
-$ modprobe ums
-```
 
 ### Development Build
 

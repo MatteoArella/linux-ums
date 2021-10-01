@@ -41,4 +41,4 @@ Due to file descriptors inheritance between parent and child processes, the
 ``pthread_atfork()`` function registers an handler that is executed in the
 child process after ``fork()`` processing completes; that handler is in charge
 of closing the :c:var:`UMS_FILENO` and reopening it, resulting thus in two
-separate pools of UMS resources.
+separate pools of UMS resources for the two processes.

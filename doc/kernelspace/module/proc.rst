@@ -34,7 +34,7 @@ scheduler thread and inside the :file:`/proc/ums/<pid>/workers` there is a
 folder for each UMS worker thread.
 
 The ``info`` file shows some statistics as the pid of the UMS thread, the
-number of context switches or the current context state (idle/running).
+number of context switches and the current context state (idle/running).
 
 The :file:`/proc/ums/<pid>/schedulers/<scheduler-pid>/workers` folder contains
 a symbolic link for each UMS worker thread the UMS scheduler has dequeued from

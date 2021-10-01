@@ -16,6 +16,12 @@ known in advance. In this way the size of the hashtable will be automatically
 adjusted providing better performances.
 Every UMS worker is indexed inside the pool by its :c:var:`ums_worker.context`.
 
+When a UMS worker is created it is registered to the dedicated UMS procfs
+at :file:`/proc/ums/<pid>/workers/<worker-pid>`, where ``<pid>`` is the
+PID of the process that opens the UMS device and ``<worker-pid>`` is the PID
+of the UMS worker.
+Once a UMS worker terminates it is unregistered from the UMS procfs.
+
 Structs
 -------
 
