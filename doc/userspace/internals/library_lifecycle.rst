@@ -4,6 +4,8 @@ UMS library lifecycle
 =====================
 
 All UMS objects are private to each process that opens the UMS device.
+Indeed every process that opens the UMS device gets allocated a private pool of
+UMS schedulers, UMS workers and completion lists.
 
 Every time that the library is loaded the UMS device is opened and a
 per-process file descriptor, named :c:var:`UMS_FILENO`, is initialized.
@@ -30,13 +32,13 @@ and it is managed at
 
 .. literalinclude:: /../src/lib/src/hooks.c
     :language: c
-    :lines: 19-23
+    :lines: 15-61
     :lineno-match:
     :dedent:
     :caption: src/lib/src/hooks.c
 
-.. literalinclude:: /../src/lib/src/hooks.c
-    :language: c
-    :lines: 30-34
-    :lineno-match:
-    :dedent:
+Due to file descriptors inheritance between parent and child processes, the
+``pthread_atfork()`` function registers an handler that is executed in the
+child process after ``fork()`` processing completes; that handler is in charge
+of closing the :c:var:`UMS_FILENO` and reopening it, resulting thus in two
+separate pools of UMS resources.
