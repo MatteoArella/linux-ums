@@ -36,6 +36,9 @@ cache_init:
 
 static void __exit ums_exit(void)
 {
+	/* wait for all RCU callbacks to fire. */
+	rcu_barrier();
+
 	unregister_ums_device();
 	ums_caches_destroy();
 	ums_proc_destroy();

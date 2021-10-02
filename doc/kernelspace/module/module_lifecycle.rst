@@ -20,7 +20,7 @@ When the module is unloaded it destroies every resources associated with it:
 
 .. literalinclude:: /../src/module/src/ums_mod.c
     :language: c
-    :lines: 37-42
+    :lines: 37-45
     :lineno-match:
     :dedent:
     :caption: src/module/src/ums_mod.c
