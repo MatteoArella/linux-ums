@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
-#define _GNU_SOURCE
-
 #include "ums/benchmark/pthread_suite.h"
 #include "../suite.h"
 #include "worker.h"

@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
-#define _GNU_SOURCE
-
 #include "worker.h"
 
 #include <stdlib.h>

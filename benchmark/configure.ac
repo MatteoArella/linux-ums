@@ -11,6 +11,9 @@ AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([foreign 1.13 subdir-objects])
 AM_SILENT_RULES([yes])
 
+# Define _GNU_SOURCE appropriately
+AC_USE_SYSTEM_EXTENSIONS
+
 # Checks for programs.
 AC_PROG_CC
 LT_PREREQ([2.4])
@@ -23,13 +26,19 @@ AC_LANG([C])
 AC_CHECK_HEADERS_ONCE([ features.h
                         stdio.h
                         stdlib.h
-                        pthread.h
                         unistd.h
+                        sched.h
                         math.h
                         time.h])
 
+# Checks for pthread implementation.
+AX_PTHREAD([ax_pthread_ok = yes])
+
 # Checks for library functions.
-AC_SEARCH_LIBS([pthread_create], [pthread])
+AS_IF([test x$ax_pthread_ok = xyes], [
+        AC_CHECK_DECLS([pthread_attr_setaffinity_np], [], [], [#include <pthread.h>])
+])
+AC_CHECK_FUNCS([sched_setaffinity])
 AC_SEARCH_LIBS([round], [m])
 
 AC_CONFIG_FILES([Makefile

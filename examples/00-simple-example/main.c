@@ -1,16 +1,18 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
-#define _GNU_SOURCE
+#include "global.h"
+#include "list.h"
 
 #include <ums.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
-#include <sched.h>
 #include <pthread.h>
 
-#include "list.h"
+#ifdef HAVE_SCHED_H
+#include <sched.h>
+#endif
 
 struct context_list_node {
 	ums_context_t context;
@@ -122,10 +124,14 @@ static void *sched_pthread_proc(void *arg)
 	ums_scheduler_startup_info_t sched_info;
 
 	sched_info.completion_list = comp_list;
-	sched_info.scheduler_param = arg;
 	sched_info.ums_scheduler_entry_point = sched_entry_proc;
 
 	INIT_LIST_HEAD(&rq.head);
+
+#if !HAVE_DECL_PTHREAD_ATTR_SETAFFINITY_NP && defined(HAVE_SCHED_SETAFFINITY)
+	(void) sched_setaffinity(0, sizeof(cpu_set_t), arg);
+	free(arg);
+#endif
 
 	if (enter_ums_scheduling_mode(&sched_info))
 		perror("enter_ums_scheduling_mode");
@@ -137,7 +143,7 @@ int initialize_ums_scheduling(pthread_t *sched_threads,
 			     long nthreads)
 {
 	pthread_attr_t attr;
-	cpu_set_t cpus;
+	cpu_set_t cpus, *cpus_arg = NULL;
 	long i;
 
 	if (pthread_attr_init(&attr))
@@ -149,22 +155,38 @@ int initialize_ums_scheduling(pthread_t *sched_threads,
 	for (i = 0L; i < nthreads; i++) {
 		CPU_ZERO(&cpus);
 		CPU_SET(i, &cpus);
+		if (pthread_attr_setdetachstate(&attr,
+						PTHREAD_CREATE_DETACHED))
+			goto out;
+#if HAVE_DECL_PTHREAD_ATTR_SETAFFINITY_NP
 		if (pthread_attr_setaffinity_np(&attr,
 						sizeof(cpu_set_t),
 						&cpus))
 			goto out;
-		if (pthread_attr_setdetachstate(&attr,
-						PTHREAD_CREATE_DETACHED))
-			goto out;
 
+#else /* !HAVE_DECL_PTHREAD_ATTR_SETAFFINITY_NP */
+#ifdef HAVE_SCHED_SETAFFINITY
+		cpus_arg = malloc(sizeof(*cpus_arg));
+		if (!cpus_arg)
+			goto out;
+		*cpus_arg = cpus;
+#endif
+#endif /* !HAVE_DECL_PTHREAD_ATTR_SETAFFINITY_NP */
 		if (pthread_create(sched_threads + i,
 				   &attr,
 				   sched_pthread_proc,
-				   NULL))
+				   cpus_arg))
+#if !HAVE_DECL_PTHREAD_ATTR_SETAFFINITY_NP && defined(HAVE_SCHED_SETAFFINITY)
+			goto sched_thread_create;
+#else
 			goto out;
+#endif
 	}
 
 	return 0;
+
+sched_thread_create:
+	free(cpus_arg);
 out:
 	delete_ums_completion_list(&comp_list);
 	return -1;

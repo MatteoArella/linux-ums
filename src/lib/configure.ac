@@ -32,7 +32,6 @@ AC_DOCS_ENABLE
 
 # Checks for header files.
 AC_CHECK_HEADERS_ONCE([ features.h
-                        pthread.h
                         stddef.h
                         stdlib.h
                         errno.h
@@ -40,10 +39,8 @@ AC_CHECK_HEADERS_ONCE([ features.h
                         fcntl.h
                         sys/ioctl.h])
 
-# Checks for typedefs, structures, and compiler characteristics.
-
-# Checks for library functions.
-AC_SEARCH_LIBS([pthread_create], [pthread])
+# Checks for pthread implementation.
+AX_PTHREAD
 
 AC_CONFIG_FILES([libums.pc
                  Makefile

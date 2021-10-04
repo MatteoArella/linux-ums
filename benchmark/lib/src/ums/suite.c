@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
-#define _GNU_SOURCE
+#include "../global.h"
 
 #include "ums/benchmark/ums_suite.h"
 #include "../suite.h"

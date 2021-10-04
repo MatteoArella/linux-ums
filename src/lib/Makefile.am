@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-AM_CFLAGS = -Wall -Werror -Wextra
+AM_CFLAGS = @PTHREAD_CFLAGS@ -Wall -Werror -Wextra
 
 lib_LTLIBRARIES = libums.la
 
@@ -16,6 +16,7 @@ EXTRA_DIST = \
 libums_la_CFLAGS = -I$(srcdir)/include -I$(srcdir)/../module/src/uapi
 
 libums_la_LDFLAGS = -version-info 0:0:0
+libums_la_LIBADD = @PTHREAD_LIBS@
 
 SUBDIRS = include
 

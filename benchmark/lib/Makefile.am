@@ -5,6 +5,7 @@ AM_CFLAGS = -Wall -Werror -Wextra
 lib_LTLIBRARIES = libums-benchmark.la
 
 libums_benchmark_la_SOURCES = \
+	src/global.h \
 	src/suite.c \
 	src/suite.h \
 	src/timer.c \
