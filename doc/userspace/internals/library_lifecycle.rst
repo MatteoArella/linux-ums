@@ -23,7 +23,7 @@ In particular the :c:var:`UMS_FILENO` is declared as
 
 .. literalinclude:: /../src/lib/src/private.h
     :language: c
-    :lines: 18
+    :lines: 20
     :lineno-match:
     :dedent:
     :caption: src/lib/src/private.h

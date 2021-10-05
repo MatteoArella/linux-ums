@@ -49,4 +49,3 @@ cd $BUILDDIR
 $BASEDIR/configure CFLAGS="-ggdb3" --enable-examples
 
 make -j $(nproc) V=1
-make -j $(nproc) V=1 check

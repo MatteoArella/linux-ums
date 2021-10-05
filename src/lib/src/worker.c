@@ -55,6 +55,11 @@ int ums_pthread_create(pthread_t *thread, ums_attr_t *ums_attr,
 {
 	worker_proc_args_t *ums_args;
 
+	if (!ums_attr || !func) {
+		errno = EFAULT;
+		return -1;
+	}
+
 	ums_args = malloc(sizeof(*ums_args));
 	if (!ums_args)
 		return -1;

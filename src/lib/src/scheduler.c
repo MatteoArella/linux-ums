@@ -11,11 +11,17 @@ int enter_ums_scheduling_mode(
 	ums_scheduler_startup_info_t *scheduler_startup_info)
 {
 	struct enter_ums_mode_args enter_args = {
-		.flags = ENTER_UMS_SCHED,
-		.ums_complist = scheduler_startup_info->completion_list
+		.flags = ENTER_UMS_SCHED
 	};
 	struct ums_sched_event event;
 	ums_activation_t scheduler_activation;
+
+	if (!scheduler_startup_info) {
+		errno = EFAULT;
+		return -1;
+	}
+
+	enter_args.ums_complist = scheduler_startup_info->completion_list;
 
 	if (enter_ums_mode(&enter_args))
 		return -1;

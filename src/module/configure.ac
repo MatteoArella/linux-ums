@@ -16,6 +16,7 @@ AC_SUBST([with_kernel], [`uname -r`])
 
 AC_ARG_VAR([KERNELDIR], ["linux kernel dir"])
 
+AM_CONDITIONAL([SANDBOXED], [test x$KERNELDIR != x])
 AS_IF([test "x$KERNELDIR" = x], [
     [KERNELDIR=/lib/modules/$with_kernel/build]
     [moduledir=/lib/modules/$with_kernel/extra]

@@ -20,6 +20,9 @@ LT_PREREQ([2.4])
 LT_INIT
 PKG_INSTALLDIR
 
+PKG_CHECK_MODULES([CHECK], [check >= 0.9.6], [], [have_check=no])
+AM_CONDITIONAL([BUILD_TESTS], [test x$have_check != xno])
+
 AC_PATH_PROG([CPPCHECK], [cppcheck], [true])
 AS_IF([test "x$CPPCHECK" = xtrue], [
     AC_MSG_WARN(['cppcheck' is recommended for developing this package.])
@@ -41,6 +44,10 @@ AC_CHECK_HEADERS_ONCE([ features.h
 
 # Checks for pthread implementation.
 AX_PTHREAD
+
+# Check if linker supports -wrap
+AX_CHECK_LINK_FLAG([-Wl,-wrap,open], [], [have_ld_wrap=no])
+AM_CONDITIONAL([HAVE_LD_WRAP], [test x$have_ld_wrap != xno])
 
 AC_CONFIG_FILES([libums.pc
                  Makefile

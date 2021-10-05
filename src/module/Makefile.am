@@ -64,15 +64,17 @@ $(module_DATA): $(automake_dummy_SOURCES) FORCE
 	$(MAKE) -C $(KERNELDIR) M=$(abs_builddir)/src modules
 
 install-moduleDATA: $(module_DATA)
-	@test -z $(DESTDIR)$(moduledir) || \
-		$(MKDIR_P) $(DESTDIR)$(moduledir)
+	$(mkinstalldirs) $(DESTDIR)$(moduledir)
 	$(INSTALL_DATA) $(abs_builddir)/src/ums.ko $(DESTDIR)$(moduledir)/ums.ko
 
 uninstall-moduleDATA:
 	$(RM) $(DESTDIR)$(moduledir)/ums.ko
 
+if SANDBOXED
+else
 install-data-local: install-moduleDATA
 	$(DEPMOD) -a
+endif
 
 uninstall-local: uninstall-moduleDATA
 

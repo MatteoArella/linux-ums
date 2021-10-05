@@ -28,7 +28,7 @@ EOF
 
 BUILDDIR=$BASEDIR/build
 
-while getopts ":ho:" opt; do
+while getopts ":ho:i:" opt; do
   case "$opt" in
   h)
     usage
@@ -72,3 +72,4 @@ cd $BUILDDIR
 $BASEDIR/configure $CONFIGURE_FLAGS --enable-examples
 
 make -j $(nproc) V=1
+make -j $(nproc) V=1 TESTS= check

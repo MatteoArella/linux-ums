@@ -16,7 +16,7 @@ The function is implemented as follows:
 
 .. literalinclude:: /../src/lib/src/worker.c
     :language: c
-    :lines: 53-70
+    :lines: 53-75
     :lineno-match:
     :dedent:
     :caption: src/lib/src/worker.c
@@ -56,7 +56,7 @@ The yielding of a UMS worker thread is implemented as follows:
 
 .. literalinclude:: /../src/lib/src/worker.c
     :language: c
-    :lines: 72-75
+    :lines: 77-80
     :lineno-match:
     :dedent:
     :caption: src/lib/src/worker.c

@@ -85,9 +85,15 @@ EOF
 }
 
 push() {
-  SRCFILE=$1
+  SRC=$1
   DESTDIR=$2
-  scp -P $SSH_PORT $SSH_OPTS $SRCFILE $SSH_USER@$SSH_IP:$DESTDIR
+  SCP_OPTS=
+
+  if [ -d "$SRC" ]; then
+    SCP_OPTS="$SCP_OPTS -r"
+  fi
+
+  scp -P $SSH_PORT $SSH_OPTS $SCP_OPTS $SRC $SSH_USER@$SSH_IP:$DESTDIR
 }
 
 shell() {

@@ -4,14 +4,12 @@
 
 int create_ums_completion_list(ums_completion_list_t *completion_list)
 {
-	ums_comp_list_id_t complist;
-	int retval;
+	if (!completion_list) {
+		errno = EFAULT;
+		return -1;
+	}
 
-	retval = ioctl(UMS_FILENO, IOCTL_CREATE_UMS_CLIST, &complist);
-	if (!retval)
-		*completion_list = complist;
-
-	return retval;
+	return ioctl(UMS_FILENO, IOCTL_CREATE_UMS_CLIST, completion_list);
 }
 
 int dequeue_ums_completion_list_items(ums_completion_list_t completion_list,
@@ -21,6 +19,11 @@ int dequeue_ums_completion_list_items(ums_completion_list_t completion_list,
 		.ums_complist = completion_list
 	};
 	int retval;
+
+	if (!ums_thread_list) {
+		errno = EFAULT;
+		return -1;
+	}
 
 	retval = ioctl(UMS_FILENO, IOCTL_DEQUEUE_UMS_CLIST, &dequeue_args);
 	if (!retval)
@@ -49,6 +52,11 @@ ums_context_t get_next_ums_list_item(ums_context_t context)
 int delete_ums_completion_list(ums_completion_list_t *completion_list)
 {
 	int retval;
+
+	if (!completion_list) {
+		errno = EFAULT;
+		return -1;
+	}
 
 	retval = ioctl(UMS_FILENO,
 		       IOCTL_DELETE_UMS_CLIST,

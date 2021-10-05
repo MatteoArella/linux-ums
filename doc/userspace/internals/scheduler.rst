@@ -15,7 +15,7 @@ in particular the :c:func:`enter_ums_scheduling_mode()` begins with:
 
 .. literalinclude:: /../src/lib/src/scheduler.c
     :language: c
-    :lines: 13-21
+    :lines: 13-27
     :lineno-match:
     :dedent:
     :caption: src/lib/src/scheduler.c
@@ -24,7 +24,7 @@ where the ``enter_ums_mode`` is defined at
 
 .. literalinclude:: /../src/lib/src/private.h
     :language: c
-    :lines: 20-23
+    :lines: 22-25
     :lineno-match:
     :dedent:
     :caption: src/lib/src/private.h
@@ -36,7 +36,7 @@ UMS :c:type:`ums_scheduler_entry_point_t`.
 
 .. literalinclude:: /../src/lib/src/scheduler.c
     :language: c
-    :lines: 23-61
+    :lines: 29-67
     :lineno-match:
     :dedent:
     :caption: src/lib/src/scheduler.c
@@ -48,7 +48,7 @@ The execution of a worker thread context is implemented as follows:
 
 .. literalinclude:: /../src/lib/src/scheduler.c
     :language: c
-    :lines: 66-69
+    :lines: 72-75
     :lineno-match:
     :dedent:
     :caption: src/lib/src/scheduler.c

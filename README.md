@@ -36,15 +36,18 @@ A PDF version of the documentation is also available [here](https://github.com/M
 - libtool
 - pkg-config
 - linux-headers
-- sphinx <sup>[1](#f1)</sup>
-- doxygen <sup>[1](#f1)</sup>
-- breathe <sup>[1](#f1)</sup>
-- sphinx_rtd_theme <sup>[1](#f1)</sup>
-- latex <sup>[2](#f2)</sup>
+- check <sup>[1](#f1)</sup>
+- sphinx <sup>[2](#f2)</sup>
+- doxygen <sup>[2](#f2)</sup>
+- breathe <sup>[2](#f2)</sup>
+- sphinx_rtd_theme <sup>[2](#f2)</sup>
+- latex <sup>[3](#f3)</sup>
 
-<a name="f1">1</a> Optional: needed only to build the documentation
+<a name="f1">1</a> Optional: needed only for userspace library tests
 
-<a name="f2">2</a> Optional: needed only to build the pdf documentation
+<a name="f2">2</a> Optional: needed only to build the documentation
+
+<a name="f3">3</a> Optional: needed only to build the pdf documentation
 
 ### Minimal Build
 
@@ -52,7 +55,8 @@ Build the userspace library and the LKM and install them into the system with:
 ```
 $ ./configure
 $ make
-$ make install
+$ make check
+$ sudo make install
 $ sudo ldconfig
 $ sudo modprobe ums
 ```
@@ -65,9 +69,9 @@ The following dependencies are needed in case of development build:
 - autoconf
 - automake
 - git
-- cppcheck <sup>[3](#f2)</sup>
+- cppcheck <sup>[4](#f4)</sup>
 
-<a name="f3">3</a> Optional: needed only for userspace library static code analysis
+<a name="f4">4</a> Optional: needed only for userspace library static code analysis
 
 ### Development Build
 

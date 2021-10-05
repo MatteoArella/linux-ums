@@ -14,4 +14,5 @@ sudo apt-get install -y \
   libtool \
   pkg-config \
   gdb \
+  check \
   cppcheck

@@ -11,14 +11,16 @@ Minimal Requirements
 - libtool
 - pkg-config
 - linux-headers
-- sphinx\ [#f1]_
-- doxygen\ [#f1]_
-- breathe\ [#f1]_
-- sphinx_rtd_theme\ [#f1]_
-- latex\ [#f2]_
+- check\ [#f1]_
+- sphinx\ [#f2]_
+- doxygen\ [#f2]_
+- breathe\ [#f2]_
+- sphinx_rtd_theme\ [#f2]_
+- latex\ [#f3]_
 
-.. [#f1] Optional: needed only to build the documentation
-.. [#f2] Optional: needed only to build the pdf documentation
+.. [#f1] Optional: needed only for userspace library tests
+.. [#f2] Optional: needed only to build the documentation
+.. [#f3] Optional: needed only to build the pdf documentation
 
 Development Requirements
 ========================
@@ -29,9 +31,9 @@ The following dependencies are needed in case of development build:
 - autoconf
 - automake
 - git
-- cppcheck\ [#f3]_
+- cppcheck\ [#f4]_
 
-.. [#f3] Optional: needed only for userspace library static code analysis
+.. [#f4] Optional: needed only for userspace library static code analysis
 
 Build
 =====
@@ -103,6 +105,7 @@ Targets
 ``html``                    Build the html documentation
 ``pdf``                     Build the pdf documentation
 ``install``                 Install into the system
+``installcheck``            Install tests into the system
 ``uninstall``               Uninstall from the system
 ``clean``                   Delete all files in the current directory that are
                             normally created by building the program
@@ -110,11 +113,14 @@ Targets
                             created by configuring or building the program
 ========================== ====================================================
 
-Install
-=======
+Minimal installation steps
+==========================
 
 .. code::
 
-    $ make install
+    $ ./configure
+    $ make
+    $ make check
+    $ sudo make install
     $ sudo ldconfig
     $ sudo modprobe ums

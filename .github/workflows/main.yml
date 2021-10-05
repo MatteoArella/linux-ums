@@ -25,8 +25,11 @@ jobs:
       - name: Build project
         run: scripts/linux/build.sh
 
-      - name: Run example
+      - name: Test project
         run: scripts/linux/test.sh
+
+      - name: Run example
+        run: scripts/linux/example.sh
 
   qemu-linux-x86_64:
     runs-on: ubuntu-latest
@@ -59,7 +62,7 @@ jobs:
         run: scripts/qemu/build.sh ${{ matrix.kernel }}
 
       - name: Run example
-        run: scripts/qemu/test.sh
+        run: scripts/qemu/example.sh
 
   release:
     needs: [linux-x86_64, qemu-linux-x86_64]

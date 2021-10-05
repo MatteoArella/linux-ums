@@ -19,6 +19,11 @@ AC_PROG_CC
 LT_PREREQ([2.4])
 LT_INIT
 
+AC_PATH_PROG([CPPCHECK], [cppcheck], [true])
+AS_IF([test "x$CPPCHECK" = xtrue], [
+    AC_MSG_WARN(['cppcheck' is recommended for developing this package.])
+])
+
 # Use the C language and compiler for the following checks
 AC_LANG([C])
 

@@ -35,7 +35,7 @@ __BEGIN_DECLS
  *	   accordingly).
  */
 extern int create_ums_completion_list(ums_completion_list_t *completion_list)
-	__THROW __nonnull ((1));
+	__THROW;
 
 /**
  * @brief Create UMS worker thread.
@@ -87,8 +87,7 @@ extern int ums_pthread_create(pthread_t *thread, ums_attr_t *ums_attr,
  *	   accordingly).
  */
 extern int enter_ums_scheduling_mode(
-	ums_scheduler_startup_info_t *scheduler_startup_info)
-		__THROW __nonnull ((1));
+	ums_scheduler_startup_info_t *scheduler_startup_info) __THROW;
 
 /**
  * @brief Retrieves user-mode scheduling (UMS) worker threads from the
@@ -126,7 +125,7 @@ extern int enter_ums_scheduling_mode(
  */
 extern int dequeue_ums_completion_list_items(
 	ums_completion_list_t completion_list, ums_context_t *ums_thread_list)
-		__THROW __nonnull ((2));
+		__THROW;
 
 /**
  * @brief Returns the next user-mode scheduling (UMS) thread context in a list
@@ -198,7 +197,7 @@ extern int ums_thread_yield(void *scheduler_param) __THROW;
  *	   accordingly).
  */
 extern int delete_ums_completion_list(ums_completion_list_t *completion_list)
-	__THROW __nonnull ((1));
+	__THROW;
 
 __END_DECLS
 

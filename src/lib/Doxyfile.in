@@ -10,7 +10,7 @@ EXTRACT_STATIC         = YES
 ENABLE_PREPROCESSING   = YES
 MACRO_EXPANSION        = YES
 EXPAND_ONLY_PREDEF     = YES
-PREDEFINED             = __attribute__(x)= __BEGIN_DECLS= __THROW= __nonnull(x)= __END_DECLS=
+PREDEFINED             = __attribute__(x)= __BEGIN_DECLS= __THROW= __END_DECLS=
 
 GENERATE_XML           = YES
 GENERATE_HTML          = NO

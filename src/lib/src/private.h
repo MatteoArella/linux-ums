@@ -3,6 +3,8 @@
 #ifndef UMS_PRIVATE_H
 #define UMS_PRIVATE_H
 
+#include <config.h>
+
 #include "../include/ums.h"
 
 #include "ums/ums_ioctl.h"

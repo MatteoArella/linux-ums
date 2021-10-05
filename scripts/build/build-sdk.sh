@@ -91,6 +91,7 @@ rm $SDK_NAME.tar.gz
 sed -i "/alias configure=/d" $SDK_NAME/environment-setup
 sed -i "/export \"KERNELDIR=/c\export \"KERNELDIR=\$(dirname \$(dirname \$SDK_PATH))/linux-$KERNEL_VERSION\"" \
   $SDK_NAME/environment-setup
+echo "export \"PKG_CONFIG_SYSROOT_DIR=\$SDK_NAME\"" >> $SDK_NAME/environment-setup
 rm start-qemu.sh
 
 cd $WORKDIR && mkdir -p $OUTPUT_DIR
