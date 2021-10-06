@@ -7,5 +7,5 @@ Name: @PACKAGE_NAME@
 Description: @PACKAGE_DESCRIPTION@
 Version: @PACKAGE_VERSION@
 
-Cflags: -I${includedir}
-Libs: -L${libdir} -lpthread -lums
+Cflags: -I${includedir} @PTHREAD_CFLAGS@
+Libs: -L${libdir} @PTHREAD_LIBS@ -lums
