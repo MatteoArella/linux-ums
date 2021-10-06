@@ -8,6 +8,7 @@ Minimal Requirements
 
 - GNU C             >= 5.1
 - GNU make          >= 3.81
+- libtool
 - pkg-config
 - linux-headers
 - sphinx\ [#f1]_
@@ -27,7 +28,6 @@ The following dependencies are needed in case of development build:
 - autotools-dev
 - autoconf
 - automake
-- libtool
 - git
 - cppcheck\ [#f3]_
 

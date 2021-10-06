@@ -33,6 +33,7 @@ A PDF version of the documentation is also available [here](https://github.com/M
 
 - GNU C >= 5.1
 - GNU make >= 3.81
+- libtool
 - pkg-config
 - linux-headers
 - sphinx <sup>[1](#f1)</sup>
@@ -63,7 +64,6 @@ The following dependencies are needed in case of development build:
 - autotools-dev
 - autoconf
 - automake
-- libtool
 - git
 - cppcheck <sup>[3](#f2)</sup>
 
