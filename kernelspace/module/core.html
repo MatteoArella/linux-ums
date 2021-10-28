@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Core structures and functionalities &mdash; Linux User-Mode Scheduling v1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="UMS Device" href="device.html" />
+    <link rel="prev" title="Module diagram" href="module_diagram.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Linux User-Mode Scheduling
+          </a>
+              <div class="version">
+                v1.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Building</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../userspace/index.html">Userspace library documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Kernel module documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../uapi.html">uAPI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../module.html">Module internals</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="module_lifecycle.html">Module lifecycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="module_diagram.html">Module diagram</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Core structures and functionalities</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#logging">Logging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id-allocation">ID allocation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="device.html">UMS Device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="context.html">UMS Context</a></li>
+<li class="toctree-l3"><a class="reference internal" href="complist.html">UMS Completion List</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scheduler.html">UMS Scheduler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="worker.html">UMS Worker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="proc.html">Procfs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks.html">Benchmarks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Linux User-Mode Scheduling</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Kernel module documentation</a> &raquo;</li>
+          <li><a href="../module.html">Module internals</a> &raquo;</li>
+      <li>Core structures and functionalities</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/kernelspace/module/core.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="core-structures-and-functionalities">
+<h1>Core structures and functionalities<a class="headerlink" href="#core-structures-and-functionalities" title="Permalink to this headline"></a></h1>
+<section id="logging">
+<h2>Logging<a class="headerlink" href="#logging" title="Permalink to this headline"></a></h2>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;log.h&gt;</span><span class="cp"></span>
+</pre></div>
+</div>
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.pr_fmt">
+<span class="target" id="log_8h_1a1f8c165bf4196327bc3abff648276d92"></span><span class="sig-name descname"><span class="n"><span class="pre">pr_fmt</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">fmt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.pr_fmt" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Defaul module <code class="docutils literal notranslate"><span class="pre">printk</span></code> format. </p>
+</dd></dl>
+
+</section>
+<section id="id-allocation">
+<h2>ID allocation<a class="headerlink" href="#id-allocation" title="Permalink to this headline"></a></h2>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;idr_l.h&gt;</span><span class="cp"></span>
+</pre></div>
+</div>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.idr_l">
+<span class="target" id="structidr__l"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">idr_l</span></span></span><a class="headerlink" href="#c.idr_l" title="Permalink to this definition"></a><br /></dt>
+<dd><p>IDR structure wrapper with internal concurrency handling. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.idr_l.idr">
+<span class="target" id="structidr__l_1ae79722220251f8df76c28f4ebe0a8255"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.idr_l.idr" title="idr"><span class="n"><span class="pre">idr</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">idr</span></span></span><a class="headerlink" href="#c.idr_l.idr" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.IDR_L_INIT">
+<span class="target" id="idr__l_8h_1a009ecda621e7a3511860cba18fcf1209"></span><span class="sig-name descname"><span class="n"><span class="pre">IDR_L_INIT</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">idr_l</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.IDR_L_INIT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Initialise a IDR. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>idr_l</strong> – pointer to the IDR </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.IDR_L_ALLOC">
+<span class="target" id="idr__l_8h_1adc49df25ac4cae939198f38ef25fb4c1"></span><span class="sig-name descname"><span class="n"><span class="pre">IDR_L_ALLOC</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">idr_l</span></span>, <span class="n"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">flags</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.IDR_L_ALLOC" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Allocate a new ID. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>idr_l</strong> – pointer to the IDR </p></li>
+<li><p><strong>ptr</strong> – <strong>[in]</strong> pointer to be associated with the new ID </p></li>
+<li><p><strong>flags</strong> – <strong>[in]</strong> memory allocation flags</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>the newly allocated ID</p></li>
+<li><p>-ENOMEM - No memory available</p></li>
+<li><p>-ENOSPC - No free IDs could be found </p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.IDR_L_FIND">
+<span class="target" id="idr__l_8h_1ab91dfdb42a98878173c0ea19930aa8d0"></span><span class="sig-name descname"><span class="n"><span class="pre">IDR_L_FIND</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">idr_l</span></span>, <span class="n"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.IDR_L_FIND" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Return pointer for given ID. </p>
+<p>Looks up the pointer associated with this ID. A NULL pointer may indicate that <code class="docutils literal notranslate"><span class="pre">id</span></code> is not allocated or that the NULL pointer was associated with this ID.</p>
+<p>This function can be called under <code class="docutils literal notranslate"><span class="pre">rcu_read_lock()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>idr_l</strong> – pointer to the IDR </p></li>
+<li><p><strong>id</strong> – <strong>[in]</strong> pointer ID</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the pointer associated with this ID </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.IDR_L_FOR_EACH">
+<span class="target" id="idr__l_8h_1a59b13390e843ded9e176a3e6738aca5e"></span><span class="sig-name descname"><span class="n"><span class="pre">IDR_L_FOR_EACH</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">idr_l</span></span>, <span class="n"><span class="pre">func</span></span>, <span class="n"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.IDR_L_FOR_EACH" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Iterate through all stored pointers. </p>
+<p>The callback function will be called for each entry in <code class="docutils literal notranslate"><a class="reference internal" href="#structidr__l"><span class="std std-ref"><span class="pre">idr_l</span></span></a></code>, passing the ID, the entry and <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">func</span></code> returns anything other than 0, the iteration stops and that value is returned from this function.</p>
+<p><a class="reference internal" href="#idr__l_8h_1a59b13390e843ded9e176a3e6738aca5e"><span class="std std-ref">IDR_L_FOR_EACH()</span></a> can be called concurrently with <a class="reference internal" href="#idr__l_8h_1adc49df25ac4cae939198f38ef25fb4c1"><span class="std std-ref">IDR_L_ALLOC()</span></a> and <a class="reference internal" href="#idr__l_8h_1a304993dc67b9479ab43290a3c4734c7b"><span class="std std-ref">IDR_L_REMOVE()</span></a> if protected by RCU. Newly added entries may not be seen and deleted entries may be seen, but adding and removing entries will not cause other entries to be skipped, nor spurious ones to be seen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>idr_l</strong> – pointer to the IDR </p></li>
+<li><p><strong>func</strong> – <strong>[in]</strong> function to be called for each pointer </p></li>
+<li><p><strong>data</strong> – <strong>[in]</strong> data passed to callback function </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.IDR_L_REMOVE">
+<span class="target" id="idr__l_8h_1a304993dc67b9479ab43290a3c4734c7b"></span><span class="sig-name descname"><span class="n"><span class="pre">IDR_L_REMOVE</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">idr_l</span></span>, <span class="n"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.IDR_L_REMOVE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Remove an ID from the IDR. </p>
+<p>Removes this ID from the IDR. If the ID was not previously in the IDR, this function returns NULL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>idr_l</strong> – pointer to the IDR </p></li>
+<li><p><strong>id</strong> – <strong>[in]</strong> pointer ID</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the pointer formerly associated with this ID </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.IDR_L_DESTROY">
+<span class="target" id="idr__l_8h_1a0f68a7e5d58f14df5cab05d60daf7508"></span><span class="sig-name descname"><span class="n"><span class="pre">IDR_L_DESTROY</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">idr_l</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.IDR_L_DESTROY" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Release all internal memory from an IDR. </p>
+<p>After this function is called, the IDR is empty, and may be reused or the data structure containing it may be freed.</p>
+<p>A typical clean-up sequence for objects stored in an idr tree will use <a class="reference internal" href="#idr__l_8h_1a59b13390e843ded9e176a3e6738aca5e"><span class="std std-ref">IDR_L_FOR_EACH()</span></a> to free all objects, if necessary, then <a class="reference internal" href="#idr__l_8h_1a0f68a7e5d58f14df5cab05d60daf7508"><span class="std std-ref">IDR_L_DESTROY()</span></a> to free the memory used to keep track of those objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>idr_l</strong> – pointer to the IDR </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="module_diagram.html" class="btn btn-neutral float-left" title="Module diagram" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="device.html" class="btn btn-neutral float-right" title="UMS Device" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Arella Matteo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

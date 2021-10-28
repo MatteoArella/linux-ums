@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UMS Worker &mdash; Linux User-Mode Scheduling v1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Procfs" href="proc.html" />
+    <link rel="prev" title="UMS Scheduler" href="scheduler.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Linux User-Mode Scheduling
+          </a>
+              <div class="version">
+                v1.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Building</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../userspace/index.html">Userspace library documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Kernel module documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../uapi.html">uAPI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../module.html">Module internals</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="module_lifecycle.html">Module lifecycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="module_diagram.html">Module diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="core.html">Core structures and functionalities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="device.html">UMS Device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="context.html">UMS Context</a></li>
+<li class="toctree-l3"><a class="reference internal" href="complist.html">UMS Completion List</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scheduler.html">UMS Scheduler</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">UMS Worker</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#structs">Structs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="proc.html">Procfs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks.html">Benchmarks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Linux User-Mode Scheduling</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Kernel module documentation</a> &raquo;</li>
+          <li><a href="../module.html">Module internals</a> &raquo;</li>
+      <li>UMS Worker</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/kernelspace/module/worker.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ums-worker">
+<h1>UMS Worker<a class="headerlink" href="#ums-worker" title="Permalink to this headline"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline"></a></h2>
+<p>The life cycle of a UMS worker is bounded to the process that opens the UMS
+device and it is represented by the <a class="reference internal" href="#c.ums_worker" title="ums_worker"><code class="xref c c-struct docutils literal notranslate"><span class="pre">ums_worker</span></code></a> structure.
+Once created, it is stored inside the pool of workers pointed by
+<a class="reference internal" href="device.html#c.ums_data.workers" title="ums_data.workers"><code class="xref c c-var docutils literal notranslate"><span class="pre">ums_data.workers</span></code></a>.
+The kernel <code class="docutils literal notranslate"><span class="pre">rhashtable</span></code> structure has been choosen for representing the
+workers pool since the number of UMS workers that are going to be created isn’t
+known in advance. In this way the size of the hashtable will be automatically
+adjusted providing better performances.
+Every UMS worker is indexed inside the pool by its <a class="reference internal" href="#c.ums_worker.context" title="ums_worker.context"><code class="xref c c-var docutils literal notranslate"><span class="pre">ums_worker.context</span></code></a>.</p>
+<p>When a UMS worker is created it is registered to the dedicated UMS procfs
+at <code class="file docutils literal notranslate"><span class="pre">/proc/ums/&lt;pid&gt;/workers/&lt;worker-pid&gt;</span></code>, where <code class="docutils literal notranslate"><span class="pre">&lt;pid&gt;</span></code> is the
+PID of the process that opens the UMS device and <code class="docutils literal notranslate"><span class="pre">&lt;worker-pid&gt;</span></code> is the PID
+of the UMS worker.
+Once a UMS worker terminates it is unregistered from the UMS procfs.</p>
+</section>
+<section id="structs">
+<h2>Structs<a class="headerlink" href="#structs" title="Permalink to this headline"></a></h2>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.ums_worker">
+<span class="target" id="structums__worker"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_worker</span></span></span><a class="headerlink" href="#c.ums_worker" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS worker struct </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_worker.context">
+<span class="target" id="structums__worker_1a88500492dd52df85ab6021cfc6af2a73"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="context.html#c.ums_context" title="ums_context"><span class="n"><span class="pre">ums_context</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">context</span></span></span><a class="headerlink" href="#c.ums_worker.context" title="Permalink to this definition"></a><br /></dt>
+<dd><p>worker context </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_worker.complist">
+<span class="target" id="structums__worker_1a0ee87d90efad3b36ae0a748f7ea0a37b"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="complist.html#c.ums_complist" title="ums_complist"><span class="n"><span class="pre">ums_complist</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">complist</span></span></span><a class="headerlink" href="#c.ums_worker.complist" title="Permalink to this definition"></a><br /></dt>
+<dd><p>worker completion list </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_worker.dirs">
+<span class="target" id="structums__worker_1a328e3eb8216bd1708679751ff31a5664"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="proc.html#c.ums_worker_proc_dirs" title="ums_worker_proc_dirs"><span class="n"><span class="pre">ums_worker_proc_dirs</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dirs</span></span></span><a class="headerlink" href="#c.ums_worker.dirs" title="Permalink to this definition"></a><br /></dt>
+<dd><p>worker procfs dirs </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h2>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.enter_ums_worker_mode">
+<span class="target" id="worker_8h_1a0ea119c009f4cda82105dcff85708a06"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">enter_ums_worker_mode</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="device.html#c.ums_data" title="ums_data"><span class="n"><span class="pre">ums_data</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="../uapi/definitions.html#c.enter_ums_mode_args" title="enter_ums_mode_args"><span class="n"><span class="pre">enter_ums_mode_args</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.enter_ums_worker_mode" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Enter UMS worker mode. </p>
+<p>Creates a UMS worker, add its UMS context to the UMS completion list and suspend the UMS worker.</p>
+<p><strong>Context</strong>: Process context. May sleep. Takes and releases the RCU lock.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – <strong>[in]</strong> pointer to the UMS data </p></li>
+<li><p><strong>args</strong> – <strong>[in]</strong> userspace pointer for args</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>0 - OK</p></li>
+<li><p>-ENOMEM - No memory available</p></li>
+<li><p>-EINVAL - Invalid UMS completion list arg </p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_worker_yield">
+<span class="target" id="worker_8h_1afc6cdeee5ce66858cddb597ad2e4a729"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_worker_yield</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="device.html#c.ums_data" title="ums_data"><span class="n"><span class="pre">ums_data</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_worker_yield" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Yield UMS worker. </p>
+<p>Add the UMS worker context to the UMS completion list, enqueue a UMS scheduling event of type <a class="reference internal" href="../uapi/definitions.html#ums__ioctl_8h_1ac21bc03403f3a6bbdc79457b28bb4c1dac16885e8cfbacdc40ceed6498fd01a68"><span class="std std-ref">THREAD_YIELD</span></a> to the parent UMS scheduler and switch the UMS context with the parent one.</p>
+<p><strong>Context</strong>: Process context. May sleep. Takes and releases the RCU lock.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – <strong>[in]</strong> pointer to the UMS data </p></li>
+<li><p><strong>args</strong> – <strong>[in]</strong> userspace pointer for args</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>0 - OK</p></li>
+<li><p>-ESRCH - Bad UMS calling thread</p></li>
+<li><p>-ENOMEM - No memory available </p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_worker_end">
+<span class="target" id="worker_8h_1abc72d606f914607f0c399ce234aa0392"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_worker_end</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="device.html#c.ums_data" title="ums_data"><span class="n"><span class="pre">ums_data</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_worker_end" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Terminate a UMS worker. </p>
+<p>Enqueue a UMS scheduling event of type <a class="reference internal" href="../uapi/definitions.html#ums__ioctl_8h_1ac21bc03403f3a6bbdc79457b28bb4c1da01872bf044bea77142e66f78352cbb24"><span class="std std-ref">THREAD_TERMINATED</span></a> to the parent UMS scheduler, destroy the UMS worker and wake up the parent UMS scheduler.</p>
+<p><strong>Context</strong>: Process context. May sleep. Takes and releases the RCU lock.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – <strong>[in]</strong> pointer to the UMS data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>0 - OK</p></li>
+<li><p>-ESRCH - Bad UMS calling thread</p></li>
+<li><p>-ENOMEM - No memory available </p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_worker_destroy">
+<span class="target" id="worker_8h_1a2fd686259f3f8490277b3a5a6017bf8a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_worker_destroy</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_worker" title="ums_worker"><span class="n"><span class="pre">ums_worker</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">worker</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_worker_destroy" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Destroy the UMS worker. </p>
+<p><strong>Context</strong>: Process context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>worker</strong> – <strong>[in]</strong> pointer to the UMS worker </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="scheduler.html" class="btn btn-neutral float-left" title="UMS Scheduler" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="proc.html" class="btn btn-neutral float-right" title="Procfs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Arella Matteo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

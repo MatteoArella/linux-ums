@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UMS Device &mdash; Linux User-Mode Scheduling v1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="UMS Context" href="context.html" />
+    <link rel="prev" title="Core structures and functionalities" href="core.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Linux User-Mode Scheduling
+          </a>
+              <div class="version">
+                v1.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Building</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../userspace/index.html">Userspace library documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Kernel module documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../uapi.html">uAPI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../module.html">Module internals</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="module_lifecycle.html">Module lifecycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="module_diagram.html">Module diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="core.html">Core structures and functionalities</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">UMS Device</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#open">Open</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#release">Release</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#structs">Structs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="context.html">UMS Context</a></li>
+<li class="toctree-l3"><a class="reference internal" href="complist.html">UMS Completion List</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scheduler.html">UMS Scheduler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="worker.html">UMS Worker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="proc.html">Procfs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks.html">Benchmarks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Linux User-Mode Scheduling</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Kernel module documentation</a> &raquo;</li>
+          <li><a href="../module.html">Module internals</a> &raquo;</li>
+      <li>UMS Device</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/kernelspace/module/device.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ums-device">
+<h1>UMS Device<a class="headerlink" href="#ums-device" title="Permalink to this headline"></a></h1>
+<p>The UMS device is registered once the kernel module is loaded.
+It supports three operations: open, ioctl and release.</p>
+<section id="open">
+<h2>Open<a class="headerlink" href="#open" title="Permalink to this headline"></a></h2>
+<p>When the UMS device is opened all required resources are allocated and
+initialized. In particular the private data of the device points to a local
+<a class="reference internal" href="#c.ums_data" title="ums_data"><code class="xref c c-struct docutils literal notranslate"><span class="pre">ums_data</span></code></a> struct.</p>
+</section>
+<section id="release">
+<h2>Release<a class="headerlink" href="#release" title="Permalink to this headline"></a></h2>
+<p>When the UMS device is closed all UMS resources that are still present in the
+<a class="reference internal" href="#c.ums_data" title="ums_data"><code class="xref c c-struct docutils literal notranslate"><span class="pre">ums_data</span></code></a> struct are released.</p>
+</section>
+<section id="structs">
+<h2>Structs<a class="headerlink" href="#structs" title="Permalink to this headline"></a></h2>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.ums_data">
+<span class="target" id="structums__data"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_data</span></span></span><a class="headerlink" href="#c.ums_data" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS device private data. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_data.comp_lists">
+<span class="target" id="structums__data_1a67787fbb016df593781d151919c17d92"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="core.html#c.idr_l" title="idr_l"><span class="n"><span class="pre">idr_l</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">comp_lists</span></span></span><a class="headerlink" href="#c.ums_data.comp_lists" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Pool of UMS completion lists </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_data.schedulers">
+<span class="target" id="structums__data_1abee1d6892d9e8021a931cfa3eafd24af"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">rhashtable</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">schedulers</span></span></span><a class="headerlink" href="#c.ums_data.schedulers" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Pool of UMS schedulers </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_data.workers">
+<span class="target" id="structums__data_1ab32a83ef70c6c38a7d4f3c3318766286"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">rhashtable</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">workers</span></span></span><a class="headerlink" href="#c.ums_data.workers" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Pool of UMS workers </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_data.dirs">
+<span class="target" id="structums__data_1a61f5e00fb3a189c3f8353921e178749a"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="proc.html#c.ums_proc_dirs" title="ums_proc_dirs"><span class="n"><span class="pre">ums_proc_dirs</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dirs</span></span></span><a class="headerlink" href="#c.ums_data.dirs" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Procfs base dirs </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h2>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_caches_init">
+<span class="target" id="ums_8h_1a73e78c49505aeaf328d3c5e96ce63e63"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_caches_init</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_caches_init" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Initialize UMS device caches. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>0 in case of success, -ERRNO otherwise </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_caches_destroy">
+<span class="target" id="ums_8h_1a9441b3fc98d1380c58e51be78031db83"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_caches_destroy</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_caches_destroy" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Destroy UMS device caches. </p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.register_ums_device">
+<span class="target" id="device_8h_1a522d240cc72122947545637c4a09f57a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">register_ums_device</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.register_ums_device" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Register UMS miscellaneous device. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>0 in case of success, -ERRNO otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.unregister_ums_device">
+<span class="target" id="device_8h_1a06f9af04d078608ffb7d6b9657aaa9fc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">unregister_ums_device</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.unregister_ums_device" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Unregister UMS miscellaneous device. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>0 in case of success, -ERRNO otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.enter_ums_mode">
+<span class="target" id="ums_8h_1a09a252287302b63bcce3350dc2b08e7d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">enter_ums_mode</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_data" title="ums_data"><span class="n"><span class="pre">ums_data</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="../uapi/definitions.html#c.enter_ums_mode_args" title="enter_ums_mode_args"><span class="n"><span class="pre">enter_ums_mode_args</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.enter_ums_mode" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Enter UMS mode. </p>
+<p>Enter UMS mode as a UMS scheduler or a UMS worker depending on <code class="docutils literal notranslate"><span class="pre">args::flags</span></code>.</p>
+<p><strong>Context</strong>: Process context. May sleep.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – <strong>[in]</strong> pointer to the UMS data </p></li>
+<li><p><strong>args</strong> – <strong>[in]</strong> userspace pointer for args</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>0 - OK</p></li>
+<li><p>-EACCESS - Bad userspace pointer</p></li>
+<li><p>-ENOMEM - No memory available</p></li>
+<li><p>-EINVAL - Invalid args </p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="core.html" class="btn btn-neutral float-left" title="Core structures and functionalities" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="context.html" class="btn btn-neutral float-right" title="UMS Context" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Arella Matteo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

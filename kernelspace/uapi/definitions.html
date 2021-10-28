@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Definitions and Data types &mdash; Linux User-Mode Scheduling v1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Usage" href="usage.html" />
+    <link rel="prev" title="uAPI" href="../uapi.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Linux User-Mode Scheduling
+          </a>
+              <div class="version">
+                v1.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Building</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../userspace/index.html">Userspace library documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Kernel module documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../uapi.html">uAPI</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Definitions and Data types</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#defines">Defines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#enums">Enums</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#structs">Structs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#typedefs">Typedefs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="usage.html">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../module.html">Module internals</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks.html">Benchmarks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Linux User-Mode Scheduling</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Kernel module documentation</a> &raquo;</li>
+          <li><a href="../uapi.html">uAPI</a> &raquo;</li>
+      <li>Definitions and Data types</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/kernelspace/uapi/definitions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="definitions-and-data-types">
+<h1>Definitions and Data types<a class="headerlink" href="#definitions-and-data-types" title="Permalink to this headline"></a></h1>
+<section id="defines">
+<h2>Defines<a class="headerlink" href="#defines" title="Permalink to this headline"></a></h2>
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.UMS_DEV_NAME">
+<span class="target" id="ums__ioctl_8h_1ae0bb14833cac9893459c7c128f168103"></span><span class="sig-name descname"><span class="n"><span class="pre">UMS_DEV_NAME</span></span></span><a class="headerlink" href="#c.UMS_DEV_NAME" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS device name </p>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.ENTER_UMS_SCHED">
+<span class="target" id="ums__ioctl_8h_1a7635feb9b9293ac2e90cd2aec98ba11b"></span><span class="sig-name descname"><span class="n"><span class="pre">ENTER_UMS_SCHED</span></span></span><a class="headerlink" href="#c.ENTER_UMS_SCHED" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Enter UMS mode as UMS scheduler thread </p>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.ENTER_UMS_WORK">
+<span class="target" id="ums__ioctl_8h_1a9ed7c5667158e1562113ad7f1999af33"></span><span class="sig-name descname"><span class="n"><span class="pre">ENTER_UMS_WORK</span></span></span><a class="headerlink" href="#c.ENTER_UMS_WORK" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Enter UMS mode as UMS worker thread </p>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.IOCTL_CREATE_UMS_CLIST">
+<span class="target" id="ums__ioctl_8h_1a3041c28ae9041d9456b95460937d70bb"></span><span class="sig-name descname"><span class="n"><span class="pre">IOCTL_CREATE_UMS_CLIST</span></span></span><a class="headerlink" href="#c.IOCTL_CREATE_UMS_CLIST" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Create UMS completion list IOCTL number </p>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.IOCTL_ENTER_UMS">
+<span class="target" id="ums__ioctl_8h_1afbaefcfd9098c95bb55f19e971e1757c"></span><span class="sig-name descname"><span class="n"><span class="pre">IOCTL_ENTER_UMS</span></span></span><a class="headerlink" href="#c.IOCTL_ENTER_UMS" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Enter UMS mode IOCTL number </p>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.IOCTL_UMS_SCHED_DQEVENT">
+<span class="target" id="ums__ioctl_8h_1aeaf95097c8c150a6cc7dfda087fa4ec8"></span><span class="sig-name descname"><span class="n"><span class="pre">IOCTL_UMS_SCHED_DQEVENT</span></span></span><a class="headerlink" href="#c.IOCTL_UMS_SCHED_DQEVENT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Dequeue UMS scheduler event IOCTL number </p>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.IOCTL_DEQUEUE_UMS_CLIST">
+<span class="target" id="ums__ioctl_8h_1aaea7750d220023a1ef27648d120954ae"></span><span class="sig-name descname"><span class="n"><span class="pre">IOCTL_DEQUEUE_UMS_CLIST</span></span></span><a class="headerlink" href="#c.IOCTL_DEQUEUE_UMS_CLIST" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Dequeue UMS context from completion list IOCTL number </p>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.IOCTL_NEXT_UMS_CTX_LIST">
+<span class="target" id="ums__ioctl_8h_1a6e4508be88bcf8967612fb0e52917798"></span><span class="sig-name descname"><span class="n"><span class="pre">IOCTL_NEXT_UMS_CTX_LIST</span></span></span><a class="headerlink" href="#c.IOCTL_NEXT_UMS_CTX_LIST" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Get next completion list UMS context IOCTL number </p>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.IOCTL_EXEC_UMS_CTX">
+<span class="target" id="ums__ioctl_8h_1a05de032f63fd16c6afa3b3cd1c365ae2"></span><span class="sig-name descname"><span class="n"><span class="pre">IOCTL_EXEC_UMS_CTX</span></span></span><a class="headerlink" href="#c.IOCTL_EXEC_UMS_CTX" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Execute UMS worker thread IOCTL number </p>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.IOCTL_UMS_YIELD">
+<span class="target" id="ums__ioctl_8h_1a8ce1f3ad8203281237040325a7577eae"></span><span class="sig-name descname"><span class="n"><span class="pre">IOCTL_UMS_YIELD</span></span></span><a class="headerlink" href="#c.IOCTL_UMS_YIELD" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS worker thread yield IOCTL number </p>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.IOCTL_EXIT_UMS">
+<span class="target" id="ums__ioctl_8h_1a0df73bbb5cd5a2fa5d71b392b284b6c0"></span><span class="sig-name descname"><span class="n"><span class="pre">IOCTL_EXIT_UMS</span></span></span><a class="headerlink" href="#c.IOCTL_EXIT_UMS" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Worker thread exit UMS mode IOCTL number </p>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.IOCTL_DELETE_UMS_CLIST">
+<span class="target" id="ums__ioctl_8h_1a06add956840cd763bb9dc883425dac0a"></span><span class="sig-name descname"><span class="n"><span class="pre">IOCTL_DELETE_UMS_CLIST</span></span></span><a class="headerlink" href="#c.IOCTL_DELETE_UMS_CLIST" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Delete UMS completion list IOCTL number </p>
+</dd></dl>
+
+</section>
+<section id="enums">
+<h2>Enums<a class="headerlink" href="#enums" title="Permalink to this headline"></a></h2>
+<dl class="c enum">
+<dt class="sig sig-object c" id="c.ums_sched_event_type_e">
+<span class="target" id="ums__ioctl_8h_1ac21bc03403f3a6bbdc79457b28bb4c1d"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_sched_event_type_e</span></span></span><a class="headerlink" href="#c.ums_sched_event_type_e" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS scheduler event type </p>
+<p><em>Values:</em></p>
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.ums_sched_event_type_e.SCHEDULER_STARTUP">
+<span class="target" id="ums__ioctl_8h_1ac21bc03403f3a6bbdc79457b28bb4c1da735846780a2c540febfe1800be0c55d1"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SCHEDULER_STARTUP</span></span></span><a class="headerlink" href="#c.ums_sched_event_type_e.SCHEDULER_STARTUP" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS scheduler startup event </p>
+</dd></dl>
+
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.ums_sched_event_type_e.THREAD_YIELD">
+<span class="target" id="ums__ioctl_8h_1ac21bc03403f3a6bbdc79457b28bb4c1dac16885e8cfbacdc40ceed6498fd01a68"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">THREAD_YIELD</span></span></span><a class="headerlink" href="#c.ums_sched_event_type_e.THREAD_YIELD" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS worker yielded event </p>
+</dd></dl>
+
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.ums_sched_event_type_e.THREAD_TERMINATED">
+<span class="target" id="ums__ioctl_8h_1ac21bc03403f3a6bbdc79457b28bb4c1da01872bf044bea77142e66f78352cbb24"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">THREAD_TERMINATED</span></span></span><a class="headerlink" href="#c.ums_sched_event_type_e.THREAD_TERMINATED" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS worker terminated event </p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="structs">
+<h2>Structs<a class="headerlink" href="#structs" title="Permalink to this headline"></a></h2>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.enter_ums_mode_args">
+<span class="target" id="structenter__ums__mode__args"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">enter_ums_mode_args</span></span></span><a class="headerlink" href="#c.enter_ums_mode_args" title="Permalink to this definition"></a><br /></dt>
+<dd><p>struct for enter UMS mode </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.enter_ums_mode_args.flags">
+<span class="target" id="structenter__ums__mode__args_1ac4e85d5f77d39efb542ed65bde08beea"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">flags</span></span></span><a class="headerlink" href="#c.enter_ums_mode_args.flags" title="Permalink to this definition"></a><br /></dt>
+<dd><p>specify caller UMS mode </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.enter_ums_mode_args.ums_complist">
+<span class="target" id="structenter__ums__mode__args_1a7fb03cab49d5d8b22fedbed79dde343a"></span><a class="reference internal" href="#c.ums_comp_list_id_t" title="ums_comp_list_id_t"><span class="n"><span class="pre">ums_comp_list_id_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_complist</span></span></span><a class="headerlink" href="#c.enter_ums_mode_args.ums_complist" title="Permalink to this definition"></a><br /></dt>
+<dd><p>the completion list to be associated with the caller </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.ums_thread_yield_args">
+<span class="target" id="structums__thread__yield__args"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_thread_yield_args</span></span></span><a class="headerlink" href="#c.ums_thread_yield_args" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS scheduler event associated to a UMS worker thread that yielded </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_thread_yield_args.context">
+<span class="target" id="structums__thread__yield__args_1a15026a26f9b27a82f4b1accc9ea25725"></span><span class="n"><span class="pre">pid_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">context</span></span></span><a class="headerlink" href="#c.ums_thread_yield_args.context" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS context of the worker thread that yielded. </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_thread_yield_args.scheduler_params">
+<span class="target" id="structums__thread__yield__args_1a3d3eb28d292c8e04eef31082a6ee8797"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">scheduler_params</span></span></span><a class="headerlink" href="#c.ums_thread_yield_args.scheduler_params" title="Permalink to this definition"></a><br /></dt>
+<dd><p>parameter passed from the UMS worker thread. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.ums_thread_end_args">
+<span class="target" id="structums__thread__end__args"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_thread_end_args</span></span></span><a class="headerlink" href="#c.ums_thread_end_args" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS scheduler event associated to a UMS worker thread that terminated </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_thread_end_args.context">
+<span class="target" id="structums__thread__end__args_1a9d331f3c90561f9f45453a05570a5fcc"></span><span class="n"><span class="pre">pid_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">context</span></span></span><a class="headerlink" href="#c.ums_thread_end_args.context" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS context of the worker thread that terminated. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.ums_sched_event">
+<span class="target" id="structums__sched__event"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_sched_event</span></span></span><a class="headerlink" href="#c.ums_sched_event" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS scheduler event </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_sched_event.type">
+<span class="target" id="structums__sched__event_1a270a732beca0ff2d5fc56b248dc4ce25"></span><a class="reference internal" href="#c.ums_sched_event_type_t" title="ums_sched_event_type_t"><span class="n"><span class="pre">ums_sched_event_type_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type</span></span></span><a class="headerlink" href="#c.ums_sched_event.type" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_sched_event.yield_params">
+<span class="target" id="structums__sched__event_1a0d4a035b2028470f89586e66c5394ac3"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_thread_yield_args" title="ums_thread_yield_args"><span class="n"><span class="pre">ums_thread_yield_args</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">yield_params</span></span></span><a class="headerlink" href="#c.ums_sched_event.yield_params" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_sched_event.end_params">
+<span class="target" id="structums__sched__event_1a86ff0d56f87fe5200826365000bd1024"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_thread_end_args" title="ums_thread_end_args"><span class="n"><span class="pre">ums_thread_end_args</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end_params</span></span></span><a class="headerlink" href="#c.ums_sched_event.end_params" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_sched_event.&#64;1">
+<span class="target" id="structums__sched__event_1a1edc939a418679b06e65acc2b455125a"></span><span class="k"><span class="pre">union</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_sched_event" title="ums_sched_event"><span class="n"><span class="pre">ums_sched_event</span></span></a><span class="p"><span class="pre">.</span></span><span class="n"><span class="pre">[anonymous]</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">[anonymous]</span></span></span><a class="headerlink" href="#c.ums_sched_event.@1" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS scheduler event parameters </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.dequeue_ums_complist_args">
+<span class="target" id="structdequeue__ums__complist__args"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dequeue_ums_complist_args</span></span></span><a class="headerlink" href="#c.dequeue_ums_complist_args" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Dequeue UMS completion list args </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.dequeue_ums_complist_args.ums_complist">
+<span class="target" id="structdequeue__ums__complist__args_1ac064e649170736606c5db8db3e3b9345"></span><a class="reference internal" href="#c.ums_comp_list_id_t" title="ums_comp_list_id_t"><span class="n"><span class="pre">ums_comp_list_id_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_complist</span></span></span><a class="headerlink" href="#c.dequeue_ums_complist_args.ums_complist" title="Permalink to this definition"></a><br /></dt>
+<dd><p>the completion list from which dequeuying UMS contexts </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.dequeue_ums_complist_args.ums_context">
+<span class="target" id="structdequeue__ums__complist__args_1a7c030f1f35203d8391fa7922ba909f77"></span><span class="n"><span class="pre">pid_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_context</span></span></span><a class="headerlink" href="#c.dequeue_ums_complist_args.ums_context" title="Permalink to this definition"></a><br /></dt>
+<dd><p>dequeued UMS context </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.ums_next_context_list_args">
+<span class="target" id="structums__next__context__list__args"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_next_context_list_args</span></span></span><a class="headerlink" href="#c.ums_next_context_list_args" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Get next UMS context list args </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_next_context_list_args.ums_context">
+<span class="target" id="structums__next__context__list__args_1af12bb7c19cbf5a2eec499329835121cf"></span><span class="n"><span class="pre">pid_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_context</span></span></span><a class="headerlink" href="#c.ums_next_context_list_args.ums_context" title="Permalink to this definition"></a><br /></dt>
+<dd><p>current UMS context in the dequeued UMS thread list </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_next_context_list_args.ums_next_context">
+<span class="target" id="structums__next__context__list__args_1af76bd1d4c441ba1e1ba6abf8140e0bd8"></span><span class="n"><span class="pre">pid_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_next_context</span></span></span><a class="headerlink" href="#c.ums_next_context_list_args.ums_next_context" title="Permalink to this definition"></a><br /></dt>
+<dd><p>next UMS context in the dequeued UMS thread list </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+<section id="typedefs">
+<h2>Typedefs<a class="headerlink" href="#typedefs" title="Permalink to this headline"></a></h2>
+<dl class="c type">
+<dt class="sig sig-object c" id="c.ums_comp_list_id_t">
+<span class="target" id="ums__ioctl_8h_1aa3ee4d6c34ca3989c71d725900a2313b"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_comp_list_id_t</span></span></span><a class="headerlink" href="#c.ums_comp_list_id_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS completion list id. </p>
+</dd></dl>
+
+<dl class="c type">
+<dt class="sig sig-object c" id="c.ums_sched_event_type_t">
+<span class="target" id="ums__ioctl_8h_1a234178f4ae31315c99ee3c27c7ae493a"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_sched_event_type_e" title="ums_sched_event_type_e"><span class="n"><span class="pre">ums_sched_event_type_e</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_sched_event_type_t</span></span></span><a class="headerlink" href="#c.ums_sched_event_type_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS scheduler event type </p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../uapi.html" class="btn btn-neutral float-left" title="uAPI" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="usage.html" class="btn btn-neutral float-right" title="Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Arella Matteo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

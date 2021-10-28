@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Building &mdash; Linux User-Mode Scheduling v1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Userspace library documentation" href="userspace/index.html" />
+    <link rel="prev" title="Overview" href="overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Linux User-Mode Scheduling
+          </a>
+              <div class="version">
+                v1.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Building</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#minimal-requirements">Minimal Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#development-requirements">Development Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#build">Build</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#options">Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#variables">Variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#targets">Targets</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#minimal-installation-steps">Minimal installation steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="userspace/index.html">Userspace library documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernelspace/index.html">Kernel module documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Linux User-Mode Scheduling</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Building</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/install.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="building">
+<h1>Building<a class="headerlink" href="#building" title="Permalink to this headline"></a></h1>
+<section id="minimal-requirements">
+<h2>Minimal Requirements<a class="headerlink" href="#minimal-requirements" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>GNU C             &gt;= 5.1</p></li>
+<li><p>GNU make          &gt;= 3.81</p></li>
+<li><p>libtool</p></li>
+<li><p>pkg-config</p></li>
+<li><p>linux-headers</p></li>
+<li><p>check<a class="footnote-reference brackets" href="#f1" id="id1">1</a></p></li>
+<li><p>sphinx<a class="footnote-reference brackets" href="#f2" id="id2">2</a></p></li>
+<li><p>doxygen<a class="footnote-reference brackets" href="#f2" id="id3">2</a></p></li>
+<li><p>breathe<a class="footnote-reference brackets" href="#f2" id="id4">2</a></p></li>
+<li><p>sphinx_rtd_theme<a class="footnote-reference brackets" href="#f2" id="id5">2</a></p></li>
+<li><p>latex<a class="footnote-reference brackets" href="#f3" id="id6">3</a></p></li>
+</ul>
+<dl class="footnote brackets">
+<dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Optional: needed only for userspace library tests</p>
+</dd>
+<dt class="label" id="f2"><span class="brackets">2</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id3">2</a>,<a href="#id4">3</a>,<a href="#id5">4</a>)</span></dt>
+<dd><p>Optional: needed only to build the documentation</p>
+</dd>
+<dt class="label" id="f3"><span class="brackets"><a class="fn-backref" href="#id6">3</a></span></dt>
+<dd><p>Optional: needed only to build the pdf documentation</p>
+</dd>
+</dl>
+</section>
+<section id="development-requirements">
+<h2>Development Requirements<a class="headerlink" href="#development-requirements" title="Permalink to this headline"></a></h2>
+<p>The following dependencies are needed in case of development build:</p>
+<ul class="simple">
+<li><p>autotools-dev</p></li>
+<li><p>autoconf</p></li>
+<li><p>automake</p></li>
+<li><p>git</p></li>
+<li><p>cppcheck<a class="footnote-reference brackets" href="#f4" id="id7">4</a></p></li>
+</ul>
+<dl class="footnote brackets">
+<dt class="label" id="f4"><span class="brackets"><a class="fn-backref" href="#id7">4</a></span></dt>
+<dd><p>Optional: needed only for userspace library static code analysis</p>
+</dd>
+</dl>
+</section>
+<section id="build">
+<h2>Build<a class="headerlink" href="#build" title="Permalink to this headline"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ./configure [OPTION]... [VAR=VALUE]... &amp;&amp; make [TARGET]...
+</pre></div>
+</div>
+<p>To assign environment variables (e.g., <code class="docutils literal notranslate"><span class="pre">CC</span></code>, <code class="docutils literal notranslate"><span class="pre">CFLAGS</span></code>…), specify them as
+<code class="docutils literal notranslate"><span class="pre">VAR=VALUE</span></code>.  See below for descriptions of some of the useful variables.</p>
+<section id="options">
+<h3>Options<a class="headerlink" href="#options" title="Permalink to this headline"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 67%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--enable-examples</span></code></p></td>
+<td><p>Enable examples build</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--enable-benchmark</span></code></p></td>
+<td><p>Enable benchmark build</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--enable-docs</span></code></p></td>
+<td><p>Enable documentation build</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--prefix=PREFIX</span></code></p></td>
+<td><p>Install architecture-independent files in
+<code class="docutils literal notranslate"><span class="pre">PREFIX</span></code>; default to <code class="file docutils literal notranslate"><span class="pre">/usr/local</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--exec-prefix=EPREFIX</span></code></p></td>
+<td><p>Install architecture-dependent files in
+<code class="docutils literal notranslate"><span class="pre">EPREFIX</span></code>; default to <code class="docutils literal notranslate"><span class="pre">PREFIX</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--bindir=DIR</span></code></p></td>
+<td><p>User executables; default to <code class="file docutils literal notranslate"><span class="pre">$EPREFIX/bin</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--libdir=DIR</span></code></p></td>
+<td><p>Object code libraries; default to
+<code class="file docutils literal notranslate"><span class="pre">$EPREFIX/lib</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--includedir=DIR</span></code></p></td>
+<td><p>C header files; default to <code class="file docutils literal notranslate"><span class="pre">$PREFIX/include</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--datarootdir=DIR</span></code></p></td>
+<td><p>Read-only architecture-independent data root;
+default to <code class="file docutils literal notranslate"><span class="pre">$PREFIX/share</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--datadir=DIR</span></code></p></td>
+<td><p>Read-only architecture-independent data; default to
+<code class="file docutils literal notranslate"><span class="pre">$DATAROOTDIR</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--docdir=DIR</span></code></p></td>
+<td><p>Documentation root; default to
+<code class="file docutils literal notranslate"><span class="pre">$DATAROOTDIR/doc/linux-ums</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--htmldir=DIR</span></code></p></td>
+<td><p>Html documentation; default to <code class="file docutils literal notranslate"><span class="pre">$DOCDIR</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--pdfdir=DIR</span></code></p></td>
+<td><p>Pdf documentation; default to <code class="file docutils literal notranslate"><span class="pre">$DOCDIR</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--build=BUILD</span></code></p></td>
+<td><p>Configure for building on <code class="docutils literal notranslate"><span class="pre">BUILD</span></code>; guessed by
+default</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--host=HOST</span></code></p></td>
+<td><p>Cross-compile to build programs to run on <code class="docutils literal notranslate"><span class="pre">HOST</span></code>;
+default to <code class="docutils literal notranslate"><span class="pre">$BUILD</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--enable-silent-rules</span></code></p></td>
+<td><p>Less verbose build output (undo: <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">V=1</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--disable-silent-rules</span></code></p></td>
+<td><p>Verbose build output (undo: <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">V=0</span></code>)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="variables">
+<h3>Variables<a class="headerlink" href="#variables" title="Permalink to this headline"></a></h3>
+<p>Some influential environment variables:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 67%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CC</span></code></p></td>
+<td><p>C compiler command</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CFLAGS</span></code></p></td>
+<td><p>C compiler flags</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">LDFLAGS</span></code></p></td>
+<td><p>Linker flags</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LIBS</span></code></p></td>
+<td><p>Libraries to pass to the linker</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CPPFLAGS</span></code></p></td>
+<td><p>C preprocessor flags</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LT_SYS_LIBRARY_PATH</span></code></p></td>
+<td><p>User-defined run-time library search path.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CPP</span></code></p></td>
+<td><p>C preprocessor</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="targets">
+<h3>Targets<a class="headerlink" href="#targets" title="Permalink to this headline"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 67%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">check</span></code></p></td>
+<td><p>Run code check</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">html</span></code></p></td>
+<td><p>Build the html documentation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pdf</span></code></p></td>
+<td><p>Build the pdf documentation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">install</span></code></p></td>
+<td><p>Install into the system</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">installcheck</span></code></p></td>
+<td><p>Install tests into the system</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">uninstall</span></code></p></td>
+<td><p>Uninstall from the system</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">clean</span></code></p></td>
+<td><p>Delete all files in the current directory that are
+normally created by building the program</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">distclean</span></code></p></td>
+<td><p>Delete all files in the current directory that are
+created by configuring or building the program</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="minimal-installation-steps">
+<h2>Minimal installation steps<a class="headerlink" href="#minimal-installation-steps" title="Permalink to this headline"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ./configure
+$ make
+$ make check
+$ sudo make install
+$ sudo ldconfig
+$ sudo modprobe ums
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="overview.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="userspace/index.html" class="btn btn-neutral float-right" title="Userspace library documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Arella Matteo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

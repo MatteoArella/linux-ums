@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Procfs &mdash; Linux User-Mode Scheduling v1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Tools" href="../../tools.html" />
+    <link rel="prev" title="UMS Worker" href="worker.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Linux User-Mode Scheduling
+          </a>
+              <div class="version">
+                v1.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Building</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../userspace/index.html">Userspace library documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Kernel module documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../uapi.html">uAPI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../module.html">Module internals</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="module_lifecycle.html">Module lifecycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="module_diagram.html">Module diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="core.html">Core structures and functionalities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="device.html">UMS Device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="context.html">UMS Context</a></li>
+<li class="toctree-l3"><a class="reference internal" href="complist.html">UMS Completion List</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scheduler.html">UMS Scheduler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="worker.html">UMS Worker</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Procfs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#structs">Structs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks.html">Benchmarks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Linux User-Mode Scheduling</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Kernel module documentation</a> &raquo;</li>
+          <li><a href="../module.html">Module internals</a> &raquo;</li>
+      <li>Procfs</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/kernelspace/module/proc.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="procfs">
+<h1>Procfs<a class="headerlink" href="#procfs" title="Permalink to this headline"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline"></a></h2>
+<p>The module exposes inside the <code class="docutils literal notranslate"><span class="pre">procfs</span></code> several informations about every
+running scheduler thread and worker thread.
+In particular for every process that opens the UMS device the following
+tree is created:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/proc/ums/&lt;pid&gt;
+├── schedulers
+│   ├── ...
+│   ├── &lt;scheduler-pid&gt;
+│   │   ├── info
+│   │   └── workers
+│   │       ├── 0 -&gt; /proc/ums/&lt;pid&gt;/workers/&lt;worker-pid&gt;
+│   │       ├── ...
+│   │       └── n -&gt; /proc/ums/&lt;pid&gt;/workers/&lt;worker-pid&gt;
+│   └── ...
+└── workers
+    ├── ...
+    ├── &lt;worker-pid&gt;
+    │   └── info
+    └── ...
+</pre></div>
+</div>
+<p>Inside the <code class="file docutils literal notranslate"><span class="pre">/proc/ums/&lt;pid&gt;/schedulers</span></code> there is a folder for each UMS
+scheduler thread and inside the <code class="file docutils literal notranslate"><span class="pre">/proc/ums/&lt;pid&gt;/workers</span></code> there is a
+folder for each UMS worker thread.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">info</span></code> file shows some statistics as the pid of the UMS thread, the
+number of context switches and the current context state (idle/running).</p>
+<p>The <code class="file docutils literal notranslate"><span class="pre">/proc/ums/&lt;pid&gt;/schedulers/&lt;scheduler-pid&gt;/workers</span></code> folder contains
+a symbolic link for each UMS worker thread the UMS scheduler has dequeued from
+the completion list; in particular the links are named from 0 to n and they
+targets the <code class="file docutils literal notranslate"><span class="pre">/proc/ums/&lt;pid&gt;/workers/&lt;worker-pid&gt;</span></code> which they refer to.</p>
+</section>
+<section id="structs">
+<h2>Structs<a class="headerlink" href="#structs" title="Permalink to this headline"></a></h2>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.ums_proc_dirs">
+<span class="target" id="structums__proc__dirs"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_proc_dirs</span></span></span><a class="headerlink" href="#c.ums_proc_dirs" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS procfs base directories for each process that opens the UMS device </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_proc_dirs.pid_dir_path">
+<span class="target" id="structums__proc__dirs_1aa60f10ebdaeed62ffd65abb8dfd859e2"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">pid_dir_path</span></span></span><a class="headerlink" href="#c.ums_proc_dirs.pid_dir_path" title="Permalink to this definition"></a><br /></dt>
+<dd><p>procfs base directory path, i.e. <code class="docutils literal notranslate"><span class="pre">/proc/ums/&lt;pid&gt;</span></code> </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_proc_dirs.pid_dir_path_size">
+<span class="target" id="structums__proc__dirs_1a390f66d3bd4e41c352f16a65bc694ef8"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pid_dir_path_size</span></span></span><a class="headerlink" href="#c.ums_proc_dirs.pid_dir_path_size" title="Permalink to this definition"></a><br /></dt>
+<dd><p>procfs base directory path length </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_proc_dirs.pid_dir">
+<span class="target" id="structums__proc__dirs_1acfa19d63f276f52b912b7e40486bc2f2"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">proc_dir_entry</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">pid_dir</span></span></span><a class="headerlink" href="#c.ums_proc_dirs.pid_dir" title="Permalink to this definition"></a><br /></dt>
+<dd><p>procfs base directory </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_proc_dirs.sched_dir">
+<span class="target" id="structums__proc__dirs_1a4e77ced9f355d442ca0aa84e69b92da3"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">proc_dir_entry</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">sched_dir</span></span></span><a class="headerlink" href="#c.ums_proc_dirs.sched_dir" title="Permalink to this definition"></a><br /></dt>
+<dd><p>procfs schedulers directory located at <code class="docutils literal notranslate"><span class="pre">/proc/ums/&lt;pid&gt;/schedulers</span></code> </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_proc_dirs.workers_dir_path">
+<span class="target" id="structums__proc__dirs_1acd0692b7512ca77d29aaf9e425a0b6be"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">workers_dir_path</span></span></span><a class="headerlink" href="#c.ums_proc_dirs.workers_dir_path" title="Permalink to this definition"></a><br /></dt>
+<dd><p>procfs workers directory path, i.e. <code class="docutils literal notranslate"><span class="pre">/proc/ums/&lt;pid&gt;/workers</span></code> </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_proc_dirs.workers_dir_path_size">
+<span class="target" id="structums__proc__dirs_1a1d9f507b3bf2f6c81f504ac16b465126"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">workers_dir_path_size</span></span></span><a class="headerlink" href="#c.ums_proc_dirs.workers_dir_path_size" title="Permalink to this definition"></a><br /></dt>
+<dd><p>procfs workers directory path length </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_proc_dirs.workers_dir">
+<span class="target" id="structums__proc__dirs_1a27076b2fa2b69fd27b73e079f96d1fdc"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">proc_dir_entry</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">workers_dir</span></span></span><a class="headerlink" href="#c.ums_proc_dirs.workers_dir" title="Permalink to this definition"></a><br /></dt>
+<dd><p>procfs workers directory </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.ums_scheduler_proc_dirs">
+<span class="target" id="structums__scheduler__proc__dirs"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_scheduler_proc_dirs</span></span></span><a class="headerlink" href="#c.ums_scheduler_proc_dirs" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS scheduler procfs directories </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_scheduler_proc_dirs.scheduler_dir">
+<span class="target" id="structums__scheduler__proc__dirs_1a1a83b58f900b9dbb74fffe2b661bc7e9"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">proc_dir_entry</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">scheduler_dir</span></span></span><a class="headerlink" href="#c.ums_scheduler_proc_dirs.scheduler_dir" title="Permalink to this definition"></a><br /></dt>
+<dd><p>procfs scheduler directory located at <code class="docutils literal notranslate"><span class="pre">/proc/ums/&lt;pid&gt;/schedulers/&lt;sched-pid&gt;</span></code> </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_scheduler_proc_dirs.scheduler_info_dir">
+<span class="target" id="structums__scheduler__proc__dirs_1a1bd9becb8cf928f67d1b74d632c82427"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">proc_dir_entry</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">scheduler_info_dir</span></span></span><a class="headerlink" href="#c.ums_scheduler_proc_dirs.scheduler_info_dir" title="Permalink to this definition"></a><br /></dt>
+<dd><p>scheduler info file located at <code class="docutils literal notranslate"><span class="pre">/proc/ums/&lt;pid&gt;/schedulers/&lt;sched-pid&gt;/info</span></code> </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_scheduler_proc_dirs.workers_dir">
+<span class="target" id="structums__scheduler__proc__dirs_1a427b0e7bd05418b5d941101325a4857f"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">proc_dir_entry</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">workers_dir</span></span></span><a class="headerlink" href="#c.ums_scheduler_proc_dirs.workers_dir" title="Permalink to this definition"></a><br /></dt>
+<dd><p>procfs scheduler’s workers directory located at <code class="docutils literal notranslate"><span class="pre">/proc/ums/&lt;pid&gt;/schedulers/&lt;sched-pid&gt;/workers</span></code> </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_scheduler_proc_dirs.n_workers">
+<span class="target" id="structums__scheduler__proc__dirs_1a8a5a83aec3d5a6b277bbfd4b5f68eb99"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">n_workers</span></span></span><a class="headerlink" href="#c.ums_scheduler_proc_dirs.n_workers" title="Permalink to this definition"></a><br /></dt>
+<dd><p>number of UMS workers dequeued from the UMS scheduler’s completion list </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_scheduler_proc_dirs.max_workers">
+<span class="target" id="structums__scheduler__proc__dirs_1ad8352700df4ac2ab4d481eb0da8d1716"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max_workers</span></span></span><a class="headerlink" href="#c.ums_scheduler_proc_dirs.max_workers" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.ums_worker_complist_node">
+<span class="target" id="structums__worker__complist__node"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_worker_complist_node</span></span></span><a class="headerlink" href="#c.ums_worker_complist_node" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS completion list node with UMS worker </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_worker_complist_node.worker_link">
+<span class="target" id="structums__worker__complist__node_1a650f15ee67b20bb551b115cb457c568e"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">proc_dir_entry</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">worker_link</span></span></span><a class="headerlink" href="#c.ums_worker_complist_node.worker_link" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Symbolic link targeting the UMS worker </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.ums_worker_proc_dirs">
+<span class="target" id="structums__worker__proc__dirs"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_worker_proc_dirs</span></span></span><a class="headerlink" href="#c.ums_worker_proc_dirs" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS worker procfs directories </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_worker_proc_dirs.worker_dir_path">
+<span class="target" id="structums__worker__proc__dirs_1aa0d9d89b241dec25942218c8940cd031"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">worker_dir_path</span></span></span><a class="headerlink" href="#c.ums_worker_proc_dirs.worker_dir_path" title="Permalink to this definition"></a><br /></dt>
+<dd><p>procfs worker directory path, i.e. <code class="docutils literal notranslate"><span class="pre">/proc/ums/&lt;pid&gt;/workers/&lt;worker-pid&gt;</span></code> </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_worker_proc_dirs.worker_dir_path_size">
+<span class="target" id="structums__worker__proc__dirs_1ac88d8330089c98e672b220c20702ddd7"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">worker_dir_path_size</span></span></span><a class="headerlink" href="#c.ums_worker_proc_dirs.worker_dir_path_size" title="Permalink to this definition"></a><br /></dt>
+<dd><p>procfs worker directory path length </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_worker_proc_dirs.worker_dir">
+<span class="target" id="structums__worker__proc__dirs_1af813a3ce204e94a4ca8d199d36471522"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">proc_dir_entry</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">worker_dir</span></span></span><a class="headerlink" href="#c.ums_worker_proc_dirs.worker_dir" title="Permalink to this definition"></a><br /></dt>
+<dd><p>procfs worker directory </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_worker_proc_dirs.worker_info_dir">
+<span class="target" id="structums__worker__proc__dirs_1a046e65f51f7dac4e66ba3391970f2c54"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">proc_dir_entry</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">worker_info_dir</span></span></span><a class="headerlink" href="#c.ums_worker_proc_dirs.worker_info_dir" title="Permalink to this definition"></a><br /></dt>
+<dd><p>worker info file located at <code class="docutils literal notranslate"><span class="pre">/proc/ums/&lt;pid&gt;/workers/&lt;worker-pid&gt;/info</span></code> </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_worker_proc_dirs.complist_node">
+<span class="target" id="structums__worker__proc__dirs_1a9a89f9133bde2630a7584e775cc19af4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_worker_complist_node" title="ums_worker_complist_node"><span class="n"><span class="pre">ums_worker_complist_node</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">complist_node</span></span></span><a class="headerlink" href="#c.ums_worker_proc_dirs.complist_node" title="Permalink to this definition"></a><br /></dt>
+<dd><p>procfs worker node with a completion list </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h2>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_proc_init">
+<span class="target" id="base_8h_1a59a66f2b2c7b28042e9046a8cadf887b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_proc_init</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_proc_init" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Initialize the UMS procfs. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>0 - OK</p></li>
+<li><p>-ENOMEM - No memory available </p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_proc_destroy">
+<span class="target" id="base_8h_1aac863545e2f2372c36b4328a6a525837"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_proc_destroy</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_proc_destroy" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Destroy the UMS procfs. </p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_proc_dirs_init">
+<span class="target" id="base_8h_1a6f568d99fada66ea0bcca4f79a14b829"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_proc_dirs_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_proc_dirs" title="ums_proc_dirs"><span class="n"><span class="pre">ums_proc_dirs</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">dirs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_proc_dirs_init" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Initialize the UMS procfs base directories. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dirs</strong> – <strong>[in]</strong> pointer to the UMS procfs directories</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>0 - OK</p></li>
+<li><p>-ENOMEM - No memory available </p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_proc_dirs_destroy">
+<span class="target" id="base_8h_1a2008d261ce7a73fafa21469edabafbf9"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_proc_dirs_destroy</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_proc_dirs" title="ums_proc_dirs"><span class="n"><span class="pre">ums_proc_dirs</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">dirs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_proc_dirs_destroy" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Destroy the UMS procfs base directories. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dirs</strong> – <strong>[in]</strong> pointer to the UMS procfs directories </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.get_context_state">
+<span class="target" id="proc_2context_8h_1abbbc65cd568b383babe7e519782171e9"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">get_context_state</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="context.html#c.ums_context" title="ums_context"><span class="n"><span class="pre">ums_context</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">context</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.get_context_state" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Get a string representation of the UMS context state. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – <strong>[in]</strong> pointer to the UMS context</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the context state representation </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.context_snprintf">
+<span class="target" id="proc_2context_8h_1a951ad21c685cd86871470dcc778f97fd"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">context_snprintf</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">buf</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">size</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="context.html#c.ums_context" title="ums_context"><span class="n"><span class="pre">ums_context</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">context</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.context_snprintf" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Get a string representation of the UMS context. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>buf</strong> – <strong>[inout]</strong> pointer to an allocated buffer </p></li>
+<li><p><strong>size</strong> – <strong>[in]</strong> maximum number of bytes to write </p></li>
+<li><p><strong>context</strong> – <strong>[in]</strong> pointer to the UMS context</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the number of characters printed or truncated </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_scheduler_proc_register">
+<span class="target" id="proc_2scheduler_8h_1a2e2b01989c7ab95d777e6c19e2c2156d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_scheduler_proc_register</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_proc_dirs" title="ums_proc_dirs"><span class="n"><span class="pre">ums_proc_dirs</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">dirs</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="scheduler.html#c.ums_scheduler" title="ums_scheduler"><span class="n"><span class="pre">ums_scheduler</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">scheduler</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_scheduler_proc_register" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Register the UMS scheduler to the UMS procfs. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dirs</strong> – <strong>[inout]</strong> pointer to the UMS procfs directories </p></li>
+<li><p><strong>scheduler</strong> – <strong>[in]</strong> pointer to the UMS scheduler</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>0 - OK</p></li>
+<li><p>-ENOMEM - No memory available </p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_scheduler_proc_unregister">
+<span class="target" id="proc_2scheduler_8h_1a3a906263991297fbc5b8dc96b8ca66af"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_scheduler_proc_unregister</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="scheduler.html#c.ums_scheduler" title="ums_scheduler"><span class="n"><span class="pre">ums_scheduler</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">scheduler</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_scheduler_proc_unregister" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Unregister the UMS scheduler to the UMS procfs. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scheduler</strong> – <strong>[in]</strong> pointer to the UMS scheduler </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_scheduler_proc_register_worker">
+<span class="target" id="proc_2scheduler_8h_1ad47b1281b67804495bdd41c42a9307fb"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_scheduler_proc_register_worker</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_scheduler_proc_dirs" title="ums_scheduler_proc_dirs"><span class="n"><span class="pre">ums_scheduler_proc_dirs</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">dirs</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_worker_proc_dirs" title="ums_worker_proc_dirs"><span class="n"><span class="pre">ums_worker_proc_dirs</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">worker_dirs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_scheduler_proc_register_worker" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Register the UMS worker to the UMS scheduler procfs. </p>
+<p>Create a symlink inside <code class="docutils literal notranslate"><span class="pre">/proc/ums/&lt;pid&gt;/schedulers/&lt;sched-pid&gt;/workers</span></code> with the UMS worker as target.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dirs</strong> – <strong>[inout]</strong> pointer to the UMS scheduler procfs directories </p></li>
+<li><p><strong>worker_dirs</strong> – <strong>[inout]</strong> pointer to the UMS worker procfs directories</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>0 - OK</p></li>
+<li><p>-ENOMEM - No memory available </p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_scheduler_proc_unregister_worker">
+<span class="target" id="proc_2scheduler_8h_1ab8d9c5c119f30c09351b8ef12ddbb887"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_scheduler_proc_unregister_worker</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_scheduler_proc_dirs" title="ums_scheduler_proc_dirs"><span class="n"><span class="pre">ums_scheduler_proc_dirs</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">dirs</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_worker_proc_dirs" title="ums_worker_proc_dirs"><span class="n"><span class="pre">ums_worker_proc_dirs</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">worker_dirs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_scheduler_proc_unregister_worker" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Unregister the UMS worker to the UMS scheduler procfs. </p>
+<p>Remove the symlink inside <code class="docutils literal notranslate"><span class="pre">/proc/ums/&lt;pid&gt;/schedulers/&lt;sched-pid&gt;/workers</span></code> with the UMS worker as target.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dirs</strong> – <strong>[inout]</strong> pointer to the UMS scheduler procfs directories </p></li>
+<li><p><strong>worker_dirs</strong> – <strong>[inout]</strong> pointer to the UMS worker procfs directories </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_worker_proc_register">
+<span class="target" id="proc_2worker_8h_1a45a12d0b91de7eeec107a4e972a816b3"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_worker_proc_register</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_proc_dirs" title="ums_proc_dirs"><span class="n"><span class="pre">ums_proc_dirs</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">dirs</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="worker.html#c.ums_worker" title="ums_worker"><span class="n"><span class="pre">ums_worker</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">worker</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_worker_proc_register" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Register the UMS worker to the UMS procfs. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dirs</strong> – <strong>[inout]</strong> pointer to the UMS procfs directories </p></li>
+<li><p><strong>worker</strong> – <strong>[in]</strong> pointer to the UMS worker</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>0 - OK</p></li>
+<li><p>-ENOMEM - No memory available </p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_worker_proc_unregister">
+<span class="target" id="proc_2worker_8h_1a862b9f553f674f0a93f4dcb93df8f079"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_worker_proc_unregister</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="worker.html#c.ums_worker" title="ums_worker"><span class="n"><span class="pre">ums_worker</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">worker</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_worker_proc_unregister" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Unregister the UMS worker to the UMS procfs. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>worker</strong> – <strong>[in]</strong> pointer to the UMS worker </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="worker.html" class="btn btn-neutral float-left" title="UMS Worker" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../tools.html" class="btn btn-neutral float-right" title="Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Arella Matteo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

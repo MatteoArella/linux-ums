@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UMS Scheduler Entry Point Function &mdash; Linux User-Mode Scheduling v1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="UMS Worker Threads and Completion Lists" href="worker.html" />
+    <link rel="prev" title="UMS Scheduler Thread" href="scheduler_thread.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Linux User-Mode Scheduling
+          </a>
+              <div class="version">
+                v1.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Building</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Userspace library documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="library.html">Userspace library</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="scheduler.html">UMS Scheduler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scheduler_thread.html">UMS Scheduler Thread</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">UMS Scheduler Entry Point Function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="worker.html">UMS Worker Threads and Completion Lists</a></li>
+<li class="toctree-l3"><a class="reference internal" href="thread_execution.html">UMS Thread Execution</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internals.html">Library internals</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../kernelspace/index.html">Kernel module documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../benchmarks.html">Benchmarks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Linux User-Mode Scheduling</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Userspace library documentation</a> &raquo;</li>
+          <li><a href="library.html">Userspace library</a> &raquo;</li>
+      <li>UMS Scheduler Entry Point Function</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/userspace/scheduler_entry_point.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ums-scheduler-entry-point-function">
+<h1>UMS Scheduler Entry Point Function<a class="headerlink" href="#ums-scheduler-entry-point-function" title="Permalink to this headline"></a></h1>
+<p>An application’s scheduler entry point function is implemented as a
+<a class="reference internal" href="api/definitions.html#c.ums_scheduler_entry_point_t" title="ums_scheduler_entry_point_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">ums_scheduler_entry_point_t</span></code></a> function. The system calls the
+application’s scheduler entry point function at the following times:</p>
+<ul class="simple">
+<li><p>When a non-UMS thread is converted to a UMS scheduler thread by calling
+<a class="reference internal" href="api/functions.html#c.enter_ums_scheduling_mode" title="enter_ums_scheduling_mode"><code class="xref c c-func docutils literal notranslate"><span class="pre">enter_ums_scheduling_mode()</span></code></a>.</p></li>
+<li><p>When a UMS worker thread calls <a class="reference internal" href="api/functions.html#c.ums_thread_yield" title="ums_thread_yield"><code class="xref c c-func docutils literal notranslate"><span class="pre">ums_thread_yield()</span></code></a>.</p></li>
+<li><p>When a UMS worker thread terminates.</p></li>
+</ul>
+<p>The <a class="reference internal" href="api/definitions.html#c.ums_reason_t" title="ums_reason_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">ums_reason_t</span></code></a> parameter of the
+<a class="reference internal" href="api/definitions.html#c.ums_scheduler_entry_point_t" title="ums_scheduler_entry_point_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">ums_scheduler_entry_point_t</span></code></a> function specifies the reason that the
+entry point function was called. If the entry point function was called because
+a new UMS scheduler thread was created, the <code class="xref c c-var docutils literal notranslate"><span class="pre">scheduler_param</span></code> parameter
+contains data specified by the caller of <a class="reference internal" href="api/functions.html#c.enter_ums_scheduling_mode" title="enter_ums_scheduling_mode"><code class="xref c c-func docutils literal notranslate"><span class="pre">enter_ums_scheduling_mode()</span></code></a>.
+If the entry point function was called because a UMS worker thread yielded, the
+<code class="xref c c-var docutils literal notranslate"><span class="pre">scheduler_param</span></code> parameter contains data specified by the caller of
+<a class="reference internal" href="api/functions.html#c.ums_thread_yield" title="ums_thread_yield"><code class="xref c c-func docutils literal notranslate"><span class="pre">ums_thread_yield()</span></code></a>. If the entry point function was called because a
+UMS worker thread terminated, the <code class="xref c c-var docutils literal notranslate"><span class="pre">scheduler_param</span></code> parameter is NULL.</p>
+<p>The scheduler entry point function is responsible for determining the
+appropriate next action for the specified thread.</p>
+<p>When the scheduler entry point function is called, the application’s scheduler
+should attempt to retrieve all of the items in its associated completion list
+by calling the <a class="reference internal" href="api/functions.html#c.dequeue_ums_completion_list_items" title="dequeue_ums_completion_list_items"><code class="xref c c-func docutils literal notranslate"><span class="pre">dequeue_ums_completion_list_items()</span></code></a> function. This
+function retrieves a list of UMS thread contexts that have finished processing
+in the kernel and are ready to run. The application’s scheduler
+should not run UMS threads directly from this list because this can cause
+unpredictable behavior in the application. Instead, the scheduler should
+retrieve all UMS thread contexts by calling the
+<a class="reference internal" href="api/functions.html#c.get_next_ums_list_item" title="get_next_ums_list_item"><code class="xref c c-func docutils literal notranslate"><span class="pre">get_next_ums_list_item()</span></code></a> function once for each context, insert the
+UMS thread contexts in the scheduler’s ready thread queue, and only then run
+UMS threads from the ready thread queue.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="scheduler_thread.html" class="btn btn-neutral float-left" title="UMS Scheduler Thread" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="worker.html" class="btn btn-neutral float-right" title="UMS Worker Threads and Completion Lists" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Arella Matteo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

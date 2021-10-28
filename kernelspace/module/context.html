@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UMS Context &mdash; Linux User-Mode Scheduling v1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="UMS Completion List" href="complist.html" />
+    <link rel="prev" title="UMS Device" href="device.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Linux User-Mode Scheduling
+          </a>
+              <div class="version">
+                v1.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Building</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../userspace/index.html">Userspace library documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Kernel module documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../uapi.html">uAPI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../module.html">Module internals</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="module_lifecycle.html">Module lifecycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="module_diagram.html">Module diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="core.html">Core structures and functionalities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="device.html">UMS Device</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">UMS Context</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#defines">Defines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#structs">Structs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="complist.html">UMS Completion List</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scheduler.html">UMS Scheduler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="worker.html">UMS Worker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="proc.html">Procfs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks.html">Benchmarks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Linux User-Mode Scheduling</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Kernel module documentation</a> &raquo;</li>
+          <li><a href="../module.html">Module internals</a> &raquo;</li>
+      <li>UMS Context</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/kernelspace/module/context.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ums-context">
+<h1>UMS Context<a class="headerlink" href="#ums-context" title="Permalink to this headline"></a></h1>
+<p>A UMS context represents the state of a UMS thread.</p>
+<p>Every UMS context is used for indexing its UMS thread owner by means of the
+<a class="reference internal" href="#c.ums_context.pid" title="ums_context.pid"><code class="xref c c-member docutils literal notranslate"><span class="pre">ums_context.pid</span></code></a> key.</p>
+<p>Both a <a class="reference internal" href="scheduler.html"><span class="doc">UMS scheduler</span></a> and a <a class="reference internal" href="worker.html"><span class="doc">UMS worker</span></a>
+contains their own UMS context.</p>
+<p>The UMS context implements all facilities for switching from UMS schedulers and
+UMS workers and viceversa.</p>
+<section id="defines">
+<h2>Defines<a class="headerlink" href="#defines" title="Permalink to this headline"></a></h2>
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.CONTEXT_RUNNING">
+<span class="target" id="context_8h_1a47bba43763840bb50c2f8b29d88e0090"></span><span class="sig-name descname"><span class="n"><span class="pre">CONTEXT_RUNNING</span></span></span><a class="headerlink" href="#c.CONTEXT_RUNNING" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS context running state </p>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.CONTEXT_IDLE">
+<span class="target" id="context_8h_1a4ce02ef1cb60d0b76f618404ea1f5c83"></span><span class="sig-name descname"><span class="n"><span class="pre">CONTEXT_IDLE</span></span></span><a class="headerlink" href="#c.CONTEXT_IDLE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS context idle state </p>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.__set_context_state">
+<span class="target" id="context_8h_1abcbf8686c930c0978bdc80f3d095fae8"></span><span class="sig-name descname"><span class="n"><span class="pre">__set_context_state</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ctx</span></span>, <span class="n"><span class="pre">state_value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.__set_context_state" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set context state. </p>
+<p><strong>Context</strong>: Any context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ctx</strong> – <strong>[in]</strong> pointer to a UMS context </p></li>
+<li><p><strong>state_value</strong> – <strong>[in]</strong> new state value </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.set_context_state">
+<span class="target" id="context_8h_1a404ab901aac5890dee0ba1bc1949432b"></span><span class="sig-name descname"><span class="n"><span class="pre">set_context_state</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ctx</span></span>, <span class="n"><span class="pre">state_value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.set_context_state" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set context state and perform a write memory barrier. </p>
+<p><strong>Context</strong>: Any context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ctx</strong> – <strong>[in]</strong> pointer to a UMS context </p></li>
+<li><p><strong>state_value</strong> – <strong>[in]</strong> new state value </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="structs">
+<h2>Structs<a class="headerlink" href="#structs" title="Permalink to this headline"></a></h2>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.ums_context">
+<span class="target" id="structums__context"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_context</span></span></span><a class="headerlink" href="#c.ums_context" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS context structure </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_context.state">
+<span class="target" id="structums__context_1a893593960f99fbdf9786562c3df6a908"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">state</span></span></span><a class="headerlink" href="#c.ums_context.state" title="Permalink to this definition"></a><br /></dt>
+<dd><p>context state </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_context.task">
+<span class="target" id="structums__context_1ac9af1d77e9257b900ff8df3c6d0af1cf"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">task_struct</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">task</span></span></span><a class="headerlink" href="#c.ums_context.task" title="Permalink to this definition"></a><br /></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">task_struct</span></code> associated with the UMS context </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_context.pid">
+<span class="target" id="structums__context_1a75f491ae43794fbc05e1ca3fd215ea38"></span><span class="n"><span class="pre">pid_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pid</span></span></span><a class="headerlink" href="#c.ums_context.pid" title="Permalink to this definition"></a><br /></dt>
+<dd><p>context key id </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_context.parent">
+<span class="target" id="structums__context_1af0cbc6871c70e5913286bc822247b8a9"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_context" title="ums_context"><span class="n"><span class="pre">ums_context</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">parent</span></span></span><a class="headerlink" href="#c.ums_context.parent" title="Permalink to this definition"></a><br /></dt>
+<dd><p>parent context </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_context.node">
+<span class="target" id="structums__context_1a1b32566b3ccce9c52962ac6e996760b1"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">rhash_head</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">node</span></span></span><a class="headerlink" href="#c.ums_context.node" title="Permalink to this definition"></a><br /></dt>
+<dd><p>context hashtable node </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_context.switches">
+<span class="target" id="structums__context_1afebf14dc93d7958ec6013b9efa31b2a5"></span><span class="n"><span class="pre">atomic_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">switches</span></span></span><a class="headerlink" href="#c.ums_context.switches" title="Permalink to this definition"></a><br /></dt>
+<dd><p>context switches counter </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_context.list">
+<span class="target" id="structums__context_1a55ed30355f0d7d16dce772f55ed58038"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">list_head</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">list</span></span></span><a class="headerlink" href="#c.ums_context.list" title="Permalink to this definition"></a><br /></dt>
+<dd><p>head to context list forming a completion list </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_context.rcu_head">
+<span class="target" id="structums__context_1a44b34698f4751921abbe0d3419a053a9"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_context.rcu_head" title="rcu_head"><span class="n"><span class="pre">rcu_head</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rcu_head</span></span></span><a class="headerlink" href="#c.ums_context.rcu_head" title="Permalink to this definition"></a><br /></dt>
+<dd><p>rcu head </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_context.data">
+<span class="target" id="structums__context_1aa2094784079b7f1a6a38c3742804a2c2"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="device.html#c.ums_data" title="ums_data"><span class="n"><span class="pre">ums_data</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">data</span></span></span><a class="headerlink" href="#c.ums_context.data" title="Permalink to this definition"></a><br /></dt>
+<dd><p>pointer to UMS device private data where this context belongs to </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h2>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_context_init">
+<span class="target" id="context_8h_1a55b66e2841cfd4cd747e5b301f4b66ec"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_context_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_context" title="ums_context"><span class="n"><span class="pre">ums_context</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">context</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_context_init" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Initialize a UMS context. </p>
+<p>Set the context task as <code class="docutils literal notranslate"><span class="pre">current</span></code> and increment its reference counter.</p>
+<p>The initialized context state is setted to <a class="reference internal" href="#context_8h_1a47bba43763840bb50c2f8b29d88e0090"><span class="std std-ref">CONTEXT_RUNNING</span></a>.</p>
+<p><strong>Context</strong>: Any context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – <strong>[in]</strong> pointer to a UMS context </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_context_deinit">
+<span class="target" id="context_8h_1a7f9638c5f014ee95f989280ea1e97391"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_context_deinit</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_context" title="ums_context"><span class="n"><span class="pre">ums_context</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">context</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_context_deinit" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Deinitialize a UMS context. </p>
+<p>Decrement context task reference counter.</p>
+<p><strong>Context</strong>: Any context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – <strong>[in]</strong> pointer to a UMS context </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.current_context_pid">
+<span class="target" id="context_8h_1a239fb5655f7ce34fc84abb1fa438e61c"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">pid_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">current_context_pid</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.current_context_pid" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Retrieve current UMS context pid. </p>
+<p><strong>Context</strong>: Any context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The virtual pid of the current UMS context. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.prepare_suspend_context">
+<span class="target" id="context_8h_1a02dc7f212eefd96197ba223fcce7dab5"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">prepare_suspend_context</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_context" title="ums_context"><span class="n"><span class="pre">ums_context</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">context</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.prepare_suspend_context" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Initialize suspending UMS context. </p>
+<p>Change context state to <a class="reference internal" href="#context_8h_1a4ce02ef1cb60d0b76f618404ea1f5c83"><span class="std std-ref">CONTEXT_IDLE</span></a></p>
+<p><strong>Context</strong>: Any context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – <strong>[in]</strong> pointer to a UMS context </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.wake_up_context">
+<span class="target" id="context_8h_1a140392b943ab9776a3afa7f0b64168e8"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">wake_up_context</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_context" title="ums_context"><span class="n"><span class="pre">ums_context</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">context</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.wake_up_context" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Wake up an idle UMS context. </p>
+<p>Change context state to <a class="reference internal" href="#context_8h_1a47bba43763840bb50c2f8b29d88e0090"><span class="std std-ref">CONTEXT_RUNNING</span></a> and wake up the context task.</p>
+<p><strong>Context</strong>: Any context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – <strong>[in]</strong> pointer to a UMS context </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.prepare_switch_context">
+<span class="target" id="context_8h_1a153c5e49de6739dd43740093852c9b74"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">prepare_switch_context</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_context" title="ums_context"><span class="n"><span class="pre">ums_context</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">from</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_context" title="ums_context"><span class="n"><span class="pre">ums_context</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">to</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.prepare_switch_context" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Initialize a UMS context switch. </p>
+<p>Assign the <code class="docutils literal notranslate"><span class="pre">from</span></code> context to the <code class="docutils literal notranslate"><span class="pre">to-&gt;parent</span></code>; suspend the <code class="docutils literal notranslate"><span class="pre">from</span></code> context and wake up the <code class="docutils literal notranslate"><span class="pre">to</span></code> context.</p>
+<p><strong>Context</strong>: Any context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>from</strong> – <strong>[in]</strong> pointer to the UMS context from which start the switch </p></li>
+<li><p><strong>to</strong> – <strong>[in]</strong> pointer to the UMS context to which end the switch </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="device.html" class="btn btn-neutral float-left" title="UMS Device" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="complist.html" class="btn btn-neutral float-right" title="UMS Completion List" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Arella Matteo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

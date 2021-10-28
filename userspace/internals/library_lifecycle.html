@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UMS library lifecycle &mdash; Linux User-Mode Scheduling v1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="UMS Scheduler" href="scheduler.html" />
+    <link rel="prev" title="Library internals" href="../internals.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Linux User-Mode Scheduling
+          </a>
+              <div class="version">
+                v1.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Building</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Userspace library documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../library.html">Userspace library</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html">API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../internals.html">Library internals</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">UMS library lifecycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scheduler.html">UMS Scheduler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="worker.html">UMS Worker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="complist.html">UMS Completion List</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../kernelspace/index.html">Kernel module documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks.html">Benchmarks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Linux User-Mode Scheduling</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Userspace library documentation</a> &raquo;</li>
+          <li><a href="../internals.html">Library internals</a> &raquo;</li>
+      <li>UMS library lifecycle</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/userspace/internals/library_lifecycle.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ums-library-lifecycle">
+<h1>UMS library lifecycle<a class="headerlink" href="#ums-library-lifecycle" title="Permalink to this headline"></a></h1>
+<p>All UMS objects are private to each process that opens the UMS device.
+Indeed every process that opens the UMS device gets allocated a private pool of
+UMS schedulers, UMS workers and completion lists.</p>
+<p>Every time that the library is loaded the UMS device is opened and a
+per-process file descriptor, named <code class="xref c c-var docutils literal notranslate"><span class="pre">UMS_FILENO</span></code>, is initialized.
+All subsequentes <code class="docutils literal notranslate"><span class="pre">ioctl</span></code> calls for interacting with the kernel module are
+performed upon that file descriptor.
+Every time that the library is unloaded the UMS device is closed, releasing all
+kernel resources that are associated with the process.</p>
+<p>That initialization and deinitialization is implemented through constructor and
+destructor functions annotated respectively with
+<code class="docutils literal notranslate"><span class="pre">__attribute__((constructor))</span></code> and <code class="docutils literal notranslate"><span class="pre">__attribute__((destructor))</span></code>
+attributes.</p>
+<p>In particular the <code class="xref c c-var docutils literal notranslate"><span class="pre">UMS_FILENO</span></code> is declared as</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">src/lib/src/private.h</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos">20</span><span class="k">extern</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">UMS_FILENO</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<p>and it is managed at</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">src/lib/src/hooks.c</span><a class="headerlink" href="#id2" title="Permalink to this code"></a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos">15</span><span class="cm">/**</span>
+<span class="linenos">16</span><span class="cm"> * @brief Open UMS file descriptor</span>
+<span class="linenos">17</span><span class="cm"> */</span><span class="w"></span>
+<span class="linenos">18</span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">ums_fileno_open</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="linenos">19</span><span class="p">{</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">	</span><span class="n">UMS_FILENO</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">open</span><span class="p">(</span><span class="s">&quot;/dev/&quot;</span><span class="w"> </span><span class="n">UMS_DEV_NAME</span><span class="p">,</span><span class="w"> </span><span class="n">O_RDONLY</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">21</span><span class="p">}</span><span class="w"></span>
+<span class="linenos">22</span>
+<span class="linenos">23</span><span class="cm">/**</span>
+<span class="linenos">24</span><span class="cm"> * @brief Close UMS file descriptor</span>
+<span class="linenos">25</span><span class="cm"> */</span><span class="w"></span>
+<span class="linenos">26</span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">ums_fileno_close</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="linenos">27</span><span class="p">{</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">	</span><span class="n">close</span><span class="p">(</span><span class="n">UMS_FILENO</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">29</span><span class="p">}</span><span class="w"></span>
+<span class="linenos">30</span>
+<span class="linenos">31</span><span class="cm">/**</span>
+<span class="linenos">32</span><span class="cm"> * @brief Handler executed in the child process after fork processing completes</span>
+<span class="linenos">33</span><span class="cm"> */</span><span class="w"></span>
+<span class="linenos">34</span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">ums_atfork_child_handler</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="linenos">35</span><span class="p">{</span><span class="w"></span>
+<span class="linenos">36</span><span class="w">	</span><span class="n">ums_fileno_close</span><span class="p">();</span><span class="w"></span>
+<span class="linenos">37</span><span class="w">	</span><span class="n">ums_fileno_open</span><span class="p">();</span><span class="w"></span>
+<span class="linenos">38</span><span class="p">}</span><span class="w"></span>
+<span class="linenos">39</span>
+<span class="linenos">40</span><span class="cm">/**</span>
+<span class="linenos">41</span><span class="cm"> * @brief UMS library ctor</span>
+<span class="linenos">42</span><span class="cm"> * </span>
+<span class="linenos">43</span><span class="cm"> * This function initializes UMS library.</span>
+<span class="linenos">44</span><span class="cm"> */</span><span class="w"></span>
+<span class="linenos">45</span><span class="n">__attribute__</span><span class="p">((</span><span class="n">constructor</span><span class="p">))</span><span class="w"></span>
+<span class="linenos">46</span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">ums_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="linenos">47</span><span class="p">{</span><span class="w"></span>
+<span class="linenos">48</span><span class="w">	</span><span class="n">ums_fileno_open</span><span class="p">();</span><span class="w"></span>
+<span class="linenos">49</span><span class="w">	</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="n">pthread_atfork</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="n">ums_atfork_child_handler</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">50</span><span class="p">}</span><span class="w"></span>
+<span class="linenos">51</span>
+<span class="linenos">52</span><span class="cm">/**</span>
+<span class="linenos">53</span><span class="cm"> * @brief UMS library dtor</span>
+<span class="linenos">54</span><span class="cm"> * </span>
+<span class="linenos">55</span><span class="cm"> * This function deinitializes UMS library.</span>
+<span class="linenos">56</span><span class="cm"> */</span><span class="w"></span>
+<span class="linenos">57</span><span class="n">__attribute__</span><span class="p">((</span><span class="n">destructor</span><span class="p">))</span><span class="w"></span>
+<span class="linenos">58</span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">ums_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="linenos">59</span><span class="p">{</span><span class="w"></span>
+<span class="linenos">60</span><span class="w">	</span><span class="n">ums_fileno_close</span><span class="p">();</span><span class="w"></span>
+<span class="linenos">61</span><span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<p>Due to file descriptors inheritance between parent and child processes, the
+<code class="docutils literal notranslate"><span class="pre">pthread_atfork()</span></code> function registers an handler that is executed in the
+child process after <code class="docutils literal notranslate"><span class="pre">fork()</span></code> processing completes; that handler is in charge
+of closing the <code class="xref c c-var docutils literal notranslate"><span class="pre">UMS_FILENO</span></code> and reopening it, resulting thus in two
+separate pools of UMS resources for the two processes.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../internals.html" class="btn btn-neutral float-left" title="Library internals" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="scheduler.html" class="btn btn-neutral float-right" title="UMS Scheduler" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Arella Matteo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

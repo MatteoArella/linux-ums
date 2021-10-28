@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Definitions and Data types &mdash; Linux User-Mode Scheduling v1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Functions" href="functions.html" />
+    <link rel="prev" title="Usage" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Linux User-Mode Scheduling
+          </a>
+              <div class="version">
+                v1.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Building</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Userspace library documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../library.html">Userspace library</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Definitions and Data types</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#defines">Defines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#enums">Enums</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#structs">Structs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#unions">Unions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#typedefs">Typedefs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="functions.html">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../internals.html">Library internals</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../kernelspace/index.html">Kernel module documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks.html">Benchmarks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Linux User-Mode Scheduling</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Userspace library documentation</a> &raquo;</li>
+          <li><a href="../api.html">API</a> &raquo;</li>
+      <li>Definitions and Data types</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/userspace/api/definitions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="definitions-and-data-types">
+<h1>Definitions and Data types<a class="headerlink" href="#definitions-and-data-types" title="Permalink to this headline"></a></h1>
+<section id="defines">
+<h2>Defines<a class="headerlink" href="#defines" title="Permalink to this headline"></a></h2>
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.UMS_SCHEDULER_STARTUP">
+<span class="target" id="umsdefs_8h_1aa02f0bec3e87ea6366e96f14ed01b751"></span><span class="sig-name descname"><span class="n"><span class="pre">UMS_SCHEDULER_STARTUP</span></span></span><a class="headerlink" href="#c.UMS_SCHEDULER_STARTUP" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS scheduling proc activation due to scheduler thread startup </p>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.UMS_SCHEDULER_THREAD_YIELD">
+<span class="target" id="umsdefs_8h_1a42b4ed5393c34c207272d37d4ec0e709"></span><span class="sig-name descname"><span class="n"><span class="pre">UMS_SCHEDULER_THREAD_YIELD</span></span></span><a class="headerlink" href="#c.UMS_SCHEDULER_THREAD_YIELD" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS scheduling proc activation due to worker thread yield </p>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.UMS_SCHEDULER_THREAD_END">
+<span class="target" id="umsdefs_8h_1a7e574445e8cf1da5993bf1d73a28e4d6"></span><span class="sig-name descname"><span class="n"><span class="pre">UMS_SCHEDULER_THREAD_END</span></span></span><a class="headerlink" href="#c.UMS_SCHEDULER_THREAD_END" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS scheduling proc activation due to worker thread termination </p>
+</dd></dl>
+
+</section>
+<section id="enums">
+<h2>Enums<a class="headerlink" href="#enums" title="Permalink to this headline"></a></h2>
+<dl class="c enum">
+<dt class="sig sig-object c" id="c.ums_reason_e">
+<span class="target" id="umsdefs_8h_1a46317b4d52dccf65d63354a6497f66c1"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_reason_e</span></span></span><a class="headerlink" href="#c.ums_reason_e" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS scheduling proc activation reason. </p>
+<p><em>Values:</em></p>
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.ums_reason_e.UMS_SCHEDULER_STARTUP">
+<span class="target" id="umsdefs_8h_1a46317b4d52dccf65d63354a6497f66c1a338e1fa545b342146fce90d8c95d4bba"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UMS_SCHEDULER_STARTUP</span></span></span><a class="headerlink" href="#c.ums_reason_e.UMS_SCHEDULER_STARTUP" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.ums_reason_e.UMS_SCHEDULER_THREAD_YIELD">
+<span class="target" id="umsdefs_8h_1a46317b4d52dccf65d63354a6497f66c1a3b5998880daa996efd85d7f12398d827"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UMS_SCHEDULER_THREAD_YIELD</span></span></span><a class="headerlink" href="#c.ums_reason_e.UMS_SCHEDULER_THREAD_YIELD" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.ums_reason_e.UMS_SCHEDULER_THREAD_END">
+<span class="target" id="umsdefs_8h_1a46317b4d52dccf65d63354a6497f66c1af3eb0a361f5933846699a7f4ad12ad01"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UMS_SCHEDULER_THREAD_END</span></span></span><a class="headerlink" href="#c.ums_reason_e.UMS_SCHEDULER_THREAD_END" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="structs">
+<h2>Structs<a class="headerlink" href="#structs" title="Permalink to this headline"></a></h2>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.ums_scheduler_startup_info_s">
+<span class="target" id="structums__scheduler__startup__info__s"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_scheduler_startup_info_s</span></span></span><a class="headerlink" href="#c.ums_scheduler_startup_info_s" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Specifies attributes for a user-mode scheduling (UMS) scheduler thread. The <a class="reference internal" href="functions.html#ums_8h_1adb865e80438f057b31b4af9a42399305"><span class="std std-ref">enter_ums_scheduling_mode()</span></a> function uses this structure. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_scheduler_startup_info_s.completion_list">
+<span class="target" id="structums__scheduler__startup__info__s_1ae8fb023bc08608585d73c1362e27fbae"></span><a class="reference internal" href="#c.ums_completion_list_t" title="ums_completion_list_t"><span class="n"><span class="pre">ums_completion_list_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">completion_list</span></span></span><a class="headerlink" href="#c.ums_scheduler_startup_info_s.completion_list" title="Permalink to this definition"></a><br /></dt>
+<dd><p>An UMS completion list to associate with the calling thread. </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_scheduler_startup_info_s.ums_scheduler_entry_point">
+<span class="target" id="structums__scheduler__startup__info__s_1a3f4b8ec88492962cbee75f2bbc39a3f7"></span><a class="reference internal" href="#c.ums_scheduler_entry_point_t" title="ums_scheduler_entry_point_t"><span class="n"><span class="pre">ums_scheduler_entry_point_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_scheduler_entry_point</span></span></span><a class="headerlink" href="#c.ums_scheduler_startup_info_s.ums_scheduler_entry_point" title="Permalink to this definition"></a><br /></dt>
+<dd><p>An application-defined <a class="reference internal" href="#umsdefs_8h_1a1f11ac2c5b8b6ab105beeb5254a40019"><span class="std std-ref">ums_scheduler_entry_point_t</span></a> entry point function. The system calls this function when the calling thread has been converted to UMS and is ready to run UMS worker threads. Subsequently, it calls this function when a UMS worker thread running on the calling thread yields or terminates. </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_scheduler_startup_info_s.scheduler_param">
+<span class="target" id="structums__scheduler__startup__info__s_1ad3eeb2806d3e31b78f509e099d0e8dd4"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">scheduler_param</span></span></span><a class="headerlink" href="#c.ums_scheduler_startup_info_s.scheduler_param" title="Permalink to this definition"></a><br /></dt>
+<dd><p>An application-defined parameter to pass to the specified <a class="reference internal" href="#umsdefs_8h_1a1f11ac2c5b8b6ab105beeb5254a40019"><span class="std std-ref">ums_scheduler_entry_point_t</span></a> function. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.ums_attr_s">
+<span class="target" id="structums__attr__s"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_attr_s</span></span></span><a class="headerlink" href="#c.ums_attr_s" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Specifies attributes for a user-mode scheduling (UMS) worker thread. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_attr_s.completion_list">
+<span class="target" id="structums__attr__s_1ab67faf7719763b558228ea5946875614"></span><a class="reference internal" href="#c.ums_completion_list_t" title="ums_completion_list_t"><span class="n"><span class="pre">ums_completion_list_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">completion_list</span></span></span><a class="headerlink" href="#c.ums_attr_s.completion_list" title="Permalink to this definition"></a><br /></dt>
+<dd><p>An UMS completion list to associate with the worker thread. The newly created worker thread is queued to the specified completion list. </p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_attr_s.pthread_attr">
+<span class="target" id="structums__attr__s_1a1c516196756454be1f1a0ff09bbd537e"></span><span class="n"><span class="pre">pthread_attr_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">pthread_attr</span></span></span><a class="headerlink" href="#c.ums_attr_s.pthread_attr" title="Permalink to this definition"></a><br /></dt>
+<dd><p>A pointer to a pthread attributes to configure the worker thread. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+<section id="unions">
+<h2>Unions<a class="headerlink" href="#unions" title="Permalink to this headline"></a></h2>
+<dl class="c union">
+<dt class="sig sig-object c" id="c.ums_activation_u">
+<span class="target" id="unionums__activation__u"></span><span class="k"><span class="pre">union</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_activation_u</span></span></span><a class="headerlink" href="#c.ums_activation_u" title="Permalink to this definition"></a><br /></dt>
+<dd><em>#include &lt;umsdefs.h&gt;</em><p>UMS scheduling proc activation. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.ums_activation_u.context">
+<span class="target" id="unionums__activation__u_1ab716543d8bd5c0a74df92e0165894ba0"></span><a class="reference internal" href="#c.ums_context_t" title="ums_context_t"><span class="n"><span class="pre">ums_context_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">context</span></span></span><a class="headerlink" href="#c.ums_activation_u.context" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS worker thread context </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+<section id="typedefs">
+<h2>Typedefs<a class="headerlink" href="#typedefs" title="Permalink to this headline"></a></h2>
+<dl class="c type">
+<dt class="sig sig-object c" id="c.ums_context_t">
+<span class="target" id="umsdefs_8h_1a9cf6d90a3362a443c00dfe66d7744458"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="n"><span class="pre">pid_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_context_t</span></span></span><a class="headerlink" href="#c.ums_context_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS worker thread context. </p>
+</dd></dl>
+
+<dl class="c type">
+<dt class="sig sig-object c" id="c.ums_completion_list_t">
+<span class="target" id="umsdefs_8h_1a43745e1b4faa81407284bbb32b74cbe0"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_completion_list_t</span></span></span><a class="headerlink" href="#c.ums_completion_list_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS completion list. </p>
+</dd></dl>
+
+<dl class="c type">
+<dt class="sig sig-object c" id="c.ums_activation_t">
+<span class="target" id="umsdefs_8h_1a14bd01b77a5b92bf2d3950cbfbdac151"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="k"><span class="pre">union</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_activation_u" title="ums_activation_u"><span class="n"><span class="pre">ums_activation_u</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_activation_t</span></span></span><a class="headerlink" href="#c.ums_activation_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS scheduling proc activation. </p>
+</dd></dl>
+
+<dl class="c type">
+<dt class="sig sig-object c" id="c.ums_reason_t">
+<span class="target" id="umsdefs_8h_1a0400d0f09278cca2e42fffc08fe2efa5"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_reason_e" title="ums_reason_e"><span class="n"><span class="pre">ums_reason_e</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_reason_t</span></span></span><a class="headerlink" href="#c.ums_reason_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>UMS scheduling proc activation reason. </p>
+</dd></dl>
+
+<dl class="c type">
+<dt class="sig sig-object c" id="c.ums_scheduler_entry_point_t">
+<span class="target" id="umsdefs_8h_1a1f11ac2c5b8b6ab105beeb5254a40019"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">ums_scheduler_entry_point_t</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#c.ums_reason_t" title="ums_reason_t"><span class="n"><span class="pre">ums_reason_t</span></span></a><span class="w"> </span><span class="n"><span class="pre">reason</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_activation_t" title="ums_activation_t"><span class="n"><span class="pre">ums_activation_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">activation</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">scheduler_param</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#c.ums_scheduler_entry_point_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>The application-defined user-mode scheduling (UMS) scheduler entry point function associated with a UMS completion list. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> – <strong>[in]</strong> The reason the scheduler entry point is being called. </p></li>
+<li><p><strong>activation</strong> – <strong>[in]</strong> If the <code class="docutils literal notranslate"><span class="pre">reason</span></code> parameter is <a class="reference internal" href="#umsdefs_8h_1aa02f0bec3e87ea6366e96f14ed01b751"><span class="std std-ref">UMS_SCHEDULER_STARTUP</span></a> or <a class="reference internal" href="#umsdefs_8h_1a7e574445e8cf1da5993bf1d73a28e4d6"><span class="std std-ref">UMS_SCHEDULER_THREAD_END</span></a>, this parameter is NULL. If the <code class="docutils literal notranslate"><span class="pre">reason</span></code> parameter is <a class="reference internal" href="#umsdefs_8h_1a42b4ed5393c34c207272d37d4ec0e709"><span class="std std-ref">UMS_SCHEDULER_THREAD_YIELD</span></a>, this parameter contains the UMS thread context of the UMS worker thread that yielded. </p></li>
+<li><p><strong>scheduler_param</strong> – <strong>[in]</strong> If the <code class="docutils literal notranslate"><span class="pre">reason</span></code> parameter is <a class="reference internal" href="#umsdefs_8h_1aa02f0bec3e87ea6366e96f14ed01b751"><span class="std std-ref">UMS_SCHEDULER_STARTUP</span></a>, this parameter is the <a class="reference internal" href="#structums__scheduler__startup__info__s_1ad3eeb2806d3e31b78f509e099d0e8dd4"><span class="std std-ref">ums_scheduler_startup_info_t::scheduler_param</span></a> member of the <a class="reference internal" href="#umsdefs_8h_1a33801a2b2bb20fd3be8a0297937aaddd"><span class="std std-ref">ums_scheduler_startup_info_t</span></a> structure passed to the <a class="reference internal" href="functions.html#ums_8h_1adb865e80438f057b31b4af9a42399305"><span class="std std-ref">enter_ums_scheduling_mode()</span></a> function that triggered the entry point call. If the <code class="docutils literal notranslate"><span class="pre">reason</span></code> parameter is <a class="reference internal" href="#umsdefs_8h_1a42b4ed5393c34c207272d37d4ec0e709"><span class="std std-ref">UMS_SCHEDULER_THREAD_YIELD</span></a> this parameter is the <code class="docutils literal notranslate"><span class="pre">scheduler_param</span></code> parameter passed to the <a class="reference internal" href="functions.html#ums_8h_1a40445afb00c0e94665828c2bb914bc2a"><span class="std std-ref">ums_thread_yield()</span></a> function that triggered the entry point call. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c type">
+<dt class="sig sig-object c" id="c.ums_scheduler_startup_info_t">
+<span class="target" id="umsdefs_8h_1a33801a2b2bb20fd3be8a0297937aaddd"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_scheduler_startup_info_s" title="ums_scheduler_startup_info_s"><span class="n"><span class="pre">ums_scheduler_startup_info_s</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_scheduler_startup_info_t</span></span></span><a class="headerlink" href="#c.ums_scheduler_startup_info_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Specifies attributes for a user-mode scheduling (UMS) scheduler thread. The <a class="reference internal" href="functions.html#ums_8h_1adb865e80438f057b31b4af9a42399305"><span class="std std-ref">enter_ums_scheduling_mode()</span></a> function uses this structure. </p>
+</dd></dl>
+
+<dl class="c type">
+<dt class="sig sig-object c" id="c.ums_attr_t">
+<span class="target" id="umsdefs_8h_1ad1fce6b0007a8ac9829737cc7914b015"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.ums_attr_s" title="ums_attr_s"><span class="n"><span class="pre">ums_attr_s</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_attr_t</span></span></span><a class="headerlink" href="#c.ums_attr_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Specifies attributes for a user-mode scheduling (UMS) worker thread. </p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="functions.html" class="btn btn-neutral float-right" title="Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Arella Matteo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

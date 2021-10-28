@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Functions &mdash; Linux User-Mode Scheduling v1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Examples" href="../examples.html" />
+    <link rel="prev" title="Definitions and Data types" href="definitions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Linux User-Mode Scheduling
+          </a>
+              <div class="version">
+                v1.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Building</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Userspace library documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../library.html">Userspace library</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="definitions.html">Definitions and Data types</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../internals.html">Library internals</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../kernelspace/index.html">Kernel module documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks.html">Benchmarks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Linux User-Mode Scheduling</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Userspace library documentation</a> &raquo;</li>
+          <li><a href="../api.html">API</a> &raquo;</li>
+      <li>Functions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/userspace/api/functions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="functions">
+<h1>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h1>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.create_ums_completion_list">
+<span class="target" id="ums_8h_1a16accba2124727c71d0045cb8d1fab47"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_ums_completion_list</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="definitions.html#c.ums_completion_list_t" title="ums_completion_list_t"><span class="n"><span class="pre">ums_completion_list_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">completion_list</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.create_ums_completion_list" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Create UMS completion list. </p>
+<p>A completion list is associated with a UMS scheduler thread when the <a class="reference internal" href="#ums_8h_1adb865e80438f057b31b4af9a42399305"><span class="std std-ref">enter_ums_scheduling_mode()</span></a> function is called to create the scheduler thread. The system queues newly created UMS worker threads to the completion list.</p>
+<p>When an application’s <a class="reference internal" href="definitions.html#umsdefs_8h_1a1f11ac2c5b8b6ab105beeb5254a40019"><span class="std std-ref">ums_scheduler_entry_point_t</span></a> entry point function is called, the application’s scheduler should retrieve items from the completion list by calling <a class="reference internal" href="#ums_8h_1a06ac18be5b150492e4f6e9c07f4f1ae9"><span class="std std-ref">dequeue_ums_completion_list_items()</span></a>.</p>
+<p>When a completion list is no longer needed, use the <a class="reference internal" href="#ums_8h_1ab0890621de2ab40454461897c5e502c8"><span class="std std-ref">delete_ums_completion_list()</span></a> to release the list. The list must be empty before it can be released.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>completion_list</strong> – <strong>[out]</strong> pointer to an empty UMS completion list.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 in case of success, -1 otherwise (with <code class="docutils literal notranslate"><span class="pre">errno</span></code> setted accordingly). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_pthread_create">
+<span class="target" id="ums_8h_1a105800875e9923b90d1067d359503e73"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_pthread_create</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">pthread_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">thread</span></span>, <a class="reference internal" href="definitions.html#c.ums_attr_t" title="ums_attr_t"><span class="n"><span class="pre">ums_attr_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ums_attr</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">)</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_pthread_create" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Create UMS worker thread. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>thread</strong> – <strong>[out]</strong> pointer to an empty pthread. </p></li>
+<li><p><strong>ums_attr</strong> – <strong>[in]</strong> pointer to a UMS worker attribute. </p></li>
+<li><p><strong>func</strong> – <strong>[in]</strong> UMS worker routine. </p></li>
+<li><p><strong>args</strong> – <strong>[in]</strong> parameter to pass to the specified worker routine.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 in case of success, -1 otherwise (with <code class="docutils literal notranslate"><span class="pre">errno</span></code> setted accordingly). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.enter_ums_scheduling_mode">
+<span class="target" id="ums_8h_1adb865e80438f057b31b4af9a42399305"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">enter_ums_scheduling_mode</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="definitions.html#c.ums_scheduler_startup_info_t" title="ums_scheduler_startup_info_t"><span class="n"><span class="pre">ums_scheduler_startup_info_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">scheduler_startup_info</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.enter_ums_scheduling_mode" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Converts the calling thread into a user-mode scheduling (UMS) scheduler thread. </p>
+<p>An application’s UMS scheduler creates one UMS scheduler thread for each processor that will be used to run UMS threads. The scheduler typically sets the affinity of the scheduler thread for a single processor, effectively reserving the processor for the use of that scheduler thread.</p>
+<p>When a UMS scheduler thread is created, the system calls the <a class="reference internal" href="definitions.html#umsdefs_8h_1a1f11ac2c5b8b6ab105beeb5254a40019"><span class="std std-ref">ums_scheduler_entry_point_t</span></a> entry point function specified with the <a class="reference internal" href="#ums_8h_1adb865e80438f057b31b4af9a42399305"><span class="std std-ref">enter_ums_scheduling_mode()</span></a> function call. The application’s scheduler is responsible for finishing any application-specific initialization of the scheduler thread and selecting a UMS worker thread to run.</p>
+<p>The application’s scheduler selects a UMS worker thread to run by calling <a class="reference internal" href="#ums_8h_1a15873a95509cf314581f3a22d5745507"><span class="std std-ref">execute_ums_thread()</span></a> with the worker thread’s UMS thread context. The worker thread runs until it yields control by calling <a class="reference internal" href="#ums_8h_1a40445afb00c0e94665828c2bb914bc2a"><span class="std std-ref">ums_thread_yield()</span></a> or terminates. The scheduler thread is then available to run another worker thread.</p>
+<p>A scheduler thread should continue to run until all of its worker threads reach a natural stopping point: that is, all worker threads have yielded or terminated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scheduler_startup_info</strong> – <strong>[in]</strong> A pointer to a structure that specifies UMS attributes for the thread, including a completion list and a <a class="reference internal" href="definitions.html#umsdefs_8h_1a1f11ac2c5b8b6ab105beeb5254a40019"><span class="std std-ref">ums_scheduler_entry_point_t</span></a> entry point function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 in case of success, -1 otherwise (with <code class="docutils literal notranslate"><span class="pre">errno</span></code> setted accordingly). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.dequeue_ums_completion_list_items">
+<span class="target" id="ums_8h_1a06ac18be5b150492e4f6e9c07f4f1ae9"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dequeue_ums_completion_list_items</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="definitions.html#c.ums_completion_list_t" title="ums_completion_list_t"><span class="n"><span class="pre">ums_completion_list_t</span></span></a><span class="w"> </span><span class="n"><span class="pre">completion_list</span></span>, <a class="reference internal" href="definitions.html#c.ums_context_t" title="ums_context_t"><span class="n"><span class="pre">ums_context_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ums_thread_list</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.dequeue_ums_completion_list_items" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Retrieves user-mode scheduling (UMS) worker threads from the specified UMS completion list. </p>
+<p>The system queues a UMS worker thread to a completion list when the worker thread is created or when it yields. The <a class="reference internal" href="#ums_8h_1a06ac18be5b150492e4f6e9c07f4f1ae9"><span class="std std-ref">dequeue_ums_completion_list_items()</span></a> function retrieves a pointer to a list of all thread contexts in the specified completion list. The <a class="reference internal" href="#ums_8h_1a1ac027b04dbb8e52ccca61243b425cdc"><span class="std std-ref">get_next_ums_list_item()</span></a> function can be used to pop UMS thread contexts off the list into the scheduler’s own ready thread queue. The scheduler is responsible for selecting threads to run based on priorities chosen by the application.</p>
+<p>Do not run UMS threads directly from the list provided by <a class="reference internal" href="#ums_8h_1a06ac18be5b150492e4f6e9c07f4f1ae9"><span class="std std-ref">dequeue_ums_completion_list_items()</span></a>, or run a thread transferred from the list to the ready thread queue before the list is completely empty. This can cause unpredictable behavior in the application.</p>
+<p>If more than one caller attempts to retrieve threads from a shared completion list, only the first caller retrieves the threads. For subsequent callers, the <a class="reference internal" href="#ums_8h_1a06ac18be5b150492e4f6e9c07f4f1ae9"><span class="std std-ref">dequeue_ums_completion_list_items()</span></a> function blocks until any UMS worker thread are queued to the completion list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>completion_list</strong> – <strong>[in]</strong> A pointer to the completion list from which to retrieve worker threads. </p></li>
+<li><p><strong>ums_thread_list</strong> – <strong>[out]</strong> A pointer to a <a class="reference internal" href="definitions.html#umsdefs_8h_1a9cf6d90a3362a443c00dfe66d7744458"><span class="std std-ref">ums_context_t</span></a> variable. On output, this parameter receives a pointer to the first UMS thread context in a list of UMS thread contexts.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 in case of success, -1 otherwise (with <code class="docutils literal notranslate"><span class="pre">errno</span></code> setted accordingly). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.get_next_ums_list_item">
+<span class="target" id="ums_8h_1a1ac027b04dbb8e52ccca61243b425cdc"></span><a class="reference internal" href="definitions.html#c.ums_context_t" title="ums_context_t"><span class="n"><span class="pre">ums_context_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_next_ums_list_item</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="definitions.html#c.ums_context_t" title="ums_context_t"><span class="n"><span class="pre">ums_context_t</span></span></a><span class="w"> </span><span class="n"><span class="pre">context</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.get_next_ums_list_item" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the next user-mode scheduling (UMS) thread context in a list of thread contexts. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – <strong>[in]</strong> A UMS context in a list of thread contexts. This list is retrieved by the <a class="reference internal" href="#ums_8h_1a06ac18be5b150492e4f6e9c07f4f1ae9"><span class="std std-ref">dequeue_ums_completion_list_items()</span></a> function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>If the function succeeds, it returns the next thread context in the list. If there is no thread context after the context specified by the <code class="docutils literal notranslate"><span class="pre">context</span></code> parameter, the function returns 0. If the function fails, the return value is -1 (with <code class="docutils literal notranslate"><span class="pre">errno</span></code> setted accordingly). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.execute_ums_thread">
+<span class="target" id="ums_8h_1a15873a95509cf314581f3a22d5745507"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">execute_ums_thread</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="definitions.html#c.ums_context_t" title="ums_context_t"><span class="n"><span class="pre">ums_context_t</span></span></a><span class="w"> </span><span class="n"><span class="pre">context</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.execute_ums_thread" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Runs the specified UMS worker thread. </p>
+<p>The <a class="reference internal" href="#ums_8h_1a15873a95509cf314581f3a22d5745507"><span class="std std-ref">execute_ums_thread()</span></a> runs the specified UMS worker thread until it yields by calling the <a class="reference internal" href="#ums_8h_1a40445afb00c0e94665828c2bb914bc2a"><span class="std std-ref">ums_thread_yield()</span></a> function or terminates.</p>
+<p>When a worker thread yields or terminates the system calls the scheduler thread’s <a class="reference internal" href="definitions.html#umsdefs_8h_1a1f11ac2c5b8b6ab105beeb5254a40019"><span class="std std-ref">ums_scheduler_entry_point_t</span></a> entry point function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – <strong>[in]</strong> The UMS thread context of the worker thread to run.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 in case of success, -1 otherwise (with <code class="docutils literal notranslate"><span class="pre">errno</span></code> setted accordingly). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ums_thread_yield">
+<span class="target" id="ums_8h_1a40445afb00c0e94665828c2bb914bc2a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ums_thread_yield</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">scheduler_param</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ums_thread_yield" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Yields control to the user-mode scheduling (UMS) scheduler thread on which the calling UMS worker thread is running. </p>
+<p>A UMS worker thread calls the <a class="reference internal" href="#ums_8h_1a40445afb00c0e94665828c2bb914bc2a"><span class="std std-ref">ums_thread_yield()</span></a> function to cooperatively yield control to the UMS scheduler thread on which the worker thread is running. If a UMS worker thread never calls <a class="reference internal" href="#ums_8h_1a40445afb00c0e94665828c2bb914bc2a"><span class="std std-ref">ums_thread_yield()</span></a>, the worker thread runs until it is terminated.</p>
+<p>When control switches to the UMS scheduler thread, the system calls the associated scheduler entry point function with the reason <a class="reference internal" href="definitions.html#umsdefs_8h_1a46317b4d52dccf65d63354a6497f66c1a3b5998880daa996efd85d7f12398d827"><span class="std std-ref">UMS_SCHEDULER_THREAD_YIELD</span></a> and the <code class="docutils literal notranslate"><span class="pre">scheduler_param</span></code> parameter specified by the worker thread in the <a class="reference internal" href="#ums_8h_1a40445afb00c0e94665828c2bb914bc2a"><span class="std std-ref">ums_thread_yield(scheduler_param)</span></a> call.</p>
+<p>The application’s scheduler is responsible for rescheduling the worker thread.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scheduler_param</strong> – <strong>[in]</strong> A parameter to pass to the scheduler thread’s <a class="reference internal" href="definitions.html#umsdefs_8h_1a1f11ac2c5b8b6ab105beeb5254a40019"><span class="std std-ref">ums_scheduler_entry_point_t</span></a> function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 in case of success, -1 otherwise (with <code class="docutils literal notranslate"><span class="pre">errno</span></code> setted accordingly). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.delete_ums_completion_list">
+<span class="target" id="ums_8h_1ab0890621de2ab40454461897c5e502c8"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">delete_ums_completion_list</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="definitions.html#c.ums_completion_list_t" title="ums_completion_list_t"><span class="n"><span class="pre">ums_completion_list_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">completion_list</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.delete_ums_completion_list" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Deletes the specified user-mode scheduling (UMS) completion list. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>completion_list</strong> – <strong>[in]</strong> A pointer to the UMS completion list to be deleted. The <a class="reference internal" href="#ums_8h_1a16accba2124727c71d0045cb8d1fab47"><span class="std std-ref">create_ums_completion_list()</span></a> function provides this pointer.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 in case of success, -1 otherwise (with <code class="docutils literal notranslate"><span class="pre">errno</span></code> setted accordingly). </p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="definitions.html" class="btn btn-neutral float-left" title="Definitions and Data types" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Arella Matteo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

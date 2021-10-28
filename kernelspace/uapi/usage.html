@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usage &mdash; Linux User-Mode Scheduling v1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Module internals" href="../module.html" />
+    <link rel="prev" title="Definitions and Data types" href="definitions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Linux User-Mode Scheduling
+          </a>
+              <div class="version">
+                v1.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Building</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../userspace/index.html">Userspace library documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Kernel module documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../uapi.html">uAPI</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="definitions.html">Definitions and Data types</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#open-ums-device">Open UMS device</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#create-ums-completion-list">Create UMS completion list</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#enter-ums-scheduler-mode">Enter UMS scheduler mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#enter-ums-worker-mode">Enter UMS worker mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dequeue-ums-scheduler-event">Dequeue UMS scheduler event</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dequeue-ums-completion-list-items">Dequeue UMS completion list items</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-next-ums-context-list-item">Get next UMS context list item</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#execute-ums-worker-context">Execute UMS worker context</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ums-worker-yield">UMS worker yield</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#exit-ums-worker-mode">Exit UMS worker mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#delete-ums-completion-list">Delete UMS completion list</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../module.html">Module internals</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks.html">Benchmarks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Linux User-Mode Scheduling</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Kernel module documentation</a> &raquo;</li>
+          <li><a href="../uapi.html">uAPI</a> &raquo;</li>
+      <li>Usage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/kernelspace/uapi/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usage">
+<span id="uapi-usage"></span><h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h1>
+<p>In order to use the UMS device include the header:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;ums/ums_ioctl.h&gt;</span><span class="cp"></span>
+</pre></div>
+</div>
+<section id="open-ums-device">
+<h2>Open UMS device<a class="headerlink" href="#open-ums-device" title="Permalink to this headline"></a></h2>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">ums_dev_fd</span><span class="p">;</span><span class="w"></span>
+
+<span class="n">ums_dev_fd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">open</span><span class="p">(</span><span class="s">&quot;/dev/&quot;</span><span class="w"> </span><span class="n">UMS_DEV_NAME</span><span class="p">,</span><span class="w"> </span><span class="n">O_RDONLY</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="create-ums-completion-list">
+<h2>Create UMS completion list<a class="headerlink" href="#create-ums-completion-list" title="Permalink to this headline"></a></h2>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">ums_comp_list_id_t</span><span class="w"> </span><span class="n">comp_list</span><span class="p">;</span><span class="w"></span>
+
+<span class="n">ioctl</span><span class="p">(</span><span class="n">ums_dev_fd</span><span class="p">,</span><span class="w"> </span><span class="n">IOCTL_CREATE_UMS_CLIST</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">comp_list</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="enter-ums-scheduler-mode">
+<h2>Enter UMS scheduler mode<a class="headerlink" href="#enter-ums-scheduler-mode" title="Permalink to this headline"></a></h2>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">enter_ums_mode_args</span><span class="w"> </span><span class="n">enter_args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ENTER_UMS_SCHED</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">ums_complist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">comp_list</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="n">ioctl</span><span class="p">(</span><span class="n">ums_dev_fd</span><span class="p">,</span><span class="w"> </span><span class="n">IOCTL_ENTER_UMS</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">enter_args</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="enter-ums-worker-mode">
+<h2>Enter UMS worker mode<a class="headerlink" href="#enter-ums-worker-mode" title="Permalink to this headline"></a></h2>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">enter_ums_mode_args</span><span class="w"> </span><span class="n">enter_args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ENTER_UMS_WORK</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">ums_complist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">comp_list</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="n">ioctl</span><span class="p">(</span><span class="n">ums_dev_fd</span><span class="p">,</span><span class="w"> </span><span class="n">IOCTL_ENTER_UMS</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">enter_args</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="dequeue-ums-scheduler-event">
+<h2>Dequeue UMS scheduler event<a class="headerlink" href="#dequeue-ums-scheduler-event" title="Permalink to this headline"></a></h2>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">ums_sched_event</span><span class="w"> </span><span class="n">event</span><span class="p">;</span><span class="w"></span>
+
+<span class="n">ioctl</span><span class="p">(</span><span class="n">ums_dev_fd</span><span class="p">,</span><span class="w"> </span><span class="n">IOCTL_UMS_SCHED_DQEVENT</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">event</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="dequeue-ums-completion-list-items">
+<h2>Dequeue UMS completion list items<a class="headerlink" href="#dequeue-ums-completion-list-items" title="Permalink to this headline"></a></h2>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">dequeue_ums_complist_args</span><span class="w"> </span><span class="n">dequeue_args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">ums_complist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">comp_list</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+<span class="n">ums_context_t</span><span class="w"> </span><span class="n">context</span><span class="p">;</span><span class="w"></span>
+
+<span class="n">ioctl</span><span class="p">(</span><span class="n">ums_dev_fd</span><span class="p">,</span><span class="w"> </span><span class="n">IOCTL_DEQUEUE_UMS_CLIST</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">dequeue_args</span><span class="p">);</span><span class="w"></span>
+<span class="n">context</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dequeue_args</span><span class="p">.</span><span class="n">ums_context</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="get-next-ums-context-list-item">
+<h2>Get next UMS context list item<a class="headerlink" href="#get-next-ums-context-list-item" title="Permalink to this headline"></a></h2>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">ums_next_context_list_args</span><span class="w"> </span><span class="n">next_context_args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">ums_context</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">context</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+<span class="n">ums_context_t</span><span class="w"> </span><span class="n">next_context</span><span class="p">;</span><span class="w"></span>
+
+<span class="n">ioctl</span><span class="p">(</span><span class="n">ums_dev_fd</span><span class="p">,</span><span class="w"> </span><span class="n">IOCTL_NEXT_UMS_CTX_LIST</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">next_context_args</span><span class="p">);</span><span class="w"></span>
+<span class="n">next_context</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">next_context_args</span><span class="p">.</span><span class="n">ums_next_context</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="execute-ums-worker-context">
+<h2>Execute UMS worker context<a class="headerlink" href="#execute-ums-worker-context" title="Permalink to this headline"></a></h2>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">ums_context_t</span><span class="w"> </span><span class="n">context</span><span class="p">;</span><span class="w"></span>
+
+<span class="n">ioctl</span><span class="p">(</span><span class="n">ums_dev_fd</span><span class="p">,</span><span class="w"> </span><span class="n">IOCTL_EXEC_UMS_CTX</span><span class="p">,</span><span class="w"> </span><span class="n">context</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="ums-worker-yield">
+<h2>UMS worker yield<a class="headerlink" href="#ums-worker-yield" title="Permalink to this headline"></a></h2>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">yield_param</span><span class="p">;</span><span class="w"></span>
+
+<span class="n">ioctl</span><span class="p">(</span><span class="n">ums_dev_fd</span><span class="p">,</span><span class="w"> </span><span class="n">IOCTL_UMS_YIELD</span><span class="p">,</span><span class="w"> </span><span class="n">yield_param</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="exit-ums-worker-mode">
+<h2>Exit UMS worker mode<a class="headerlink" href="#exit-ums-worker-mode" title="Permalink to this headline"></a></h2>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">ioctl</span><span class="p">(</span><span class="n">ums_dev_fd</span><span class="p">,</span><span class="w"> </span><span class="n">IOCTL_EXIT_UMS</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="delete-ums-completion-list">
+<h2>Delete UMS completion list<a class="headerlink" href="#delete-ums-completion-list" title="Permalink to this headline"></a></h2>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">ums_comp_list_id_t</span><span class="w"> </span><span class="n">comp_list</span><span class="p">;</span><span class="w"></span>
+
+<span class="n">ioctl</span><span class="p">(</span><span class="n">ums_dev_fd</span><span class="p">,</span><span class="w"> </span><span class="n">IOCTL_DELETE_UMS_CLIST</span><span class="p">,</span><span class="w"> </span><span class="n">comp_list</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="definitions.html" class="btn btn-neutral float-left" title="Definitions and Data types" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../module.html" class="btn btn-neutral float-right" title="Module internals" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Arella Matteo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
